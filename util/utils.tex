@@ -1,0 +1,187 @@
+%-------------------------------------------------------------
+% utils.tex
+% Generic commands which may be used throughout the document
+% should be set here
+%-------------------------------------------------------------
+
+%--
+%	A set of command for appendix testing tables
+%--
+\newcommand {\testtableheader}
+{
+	\hline
+	No & \multicolumn{3}{|c|}{BSGS}           & \multicolumn{3}{c|}{Brent} \\
+	& \multicolumn{1}{|l}{R} & S & Verdict & R & S & Verdict 		   \\
+	\hline
+}
+
+\newcommand {\testtablefooter}
+{
+	\hline
+}
+
+\newenvironment{testtable}
+{
+	\begin{tabular}{|l|l l l|l l l|}
+	\testtableheader
+}
+{
+	\testtablefooter
+	\end{tabular}
+}
+
+%--
+%	Shortcut command for QED symbol. Use it while in math environment
+%--
+\newcommand{\eop}{\ensuremath{\blacksquare}}
+
+% Bugs in LaTeX are damn AMAZING %
+%--
+%	Preventing \addvspace to throw error due to unended paragraph
+%	#1: Usual parameter entered
+%--
+\let\oldaddvspace\addvspace
+\renewcommand\addvspace[1]
+{
+	\par\oldaddvspace{#1}
+}
+
+%--
+%	Preventing \contentsline to throw error due to unended paragraph
+%	#1, #2, #3: Usual parameter entered
+%--
+\let\oldcontentsline\contentsline
+\renewcommand\contentsline[3]
+{
+	\par\oldcontentsline{#1}{#2}{#3}
+}
+
+%--
+%	Creates a text to denote an empty page
+%--
+\newcommand\emptypage
+{
+	\begin{center}
+		[\textit{Halaman ini sengaja dikosongkan}]
+	\end{center}
+	\newpage
+}
+
+%--
+%	Works as if applying two \clearpage, plus some text denoting
+%	the page is empty
+%--
+\makeatletter
+\def\cleardoublepage
+{
+	\clearpage
+	\if@twoside
+		\ifodd\c@page
+			% do nothing
+		\else
+			\emptypage
+		\fi
+	\fi
+}
+\makeatother
+%---------------------------------------------------------%
+%--					Labelling Utilities					--%
+%---------------------------------------------------------%
+
+%----------- 1 Document hierarchies
+
+%--
+%	Auto label chapter with proper prefix
+%	Param
+%	#1: Label name. If not given, #2 will be used
+%	#2:	The shown name
+%--
+\makeatletter
+
+\let\oldchapter\chapter
+
+\newcommand{\chapterstar}[1]
+{
+	\oldchapter*{#1}
+	\protect\label{sec:#1}
+}
+
+\newcommand{\chapternostar}[2][]
+{
+	\ifstrempty{#1}
+		{\oldchapter{#2}\protect\label{sec:#2}}
+		{\oldchapter[#1]{#2}\protect\label{sec:#1}}
+}
+\renewcommand{\chapter}{\@ifstar{\chapterstar}{\chapternostar}}
+
+\makeatother
+
+%--
+%	Auto label section with proper prefix
+%	Param
+%	#1: Label name. If not given, #2 will be used
+%	#2:	The shown name
+%--
+\let\oldsection\section
+\renewcommand\section[2][]
+{
+	\protect\oldsection{#2}
+	\ifstrempty{#1}{\protect\label{sec:#2}}{\protect\label{sec:#1}}
+}
+
+%--
+%	Auto label subsection with proper prefix
+%	Param
+%	#1: Label name. If not given, #2 will be used
+%	#2:	The shown name
+%--
+\let\oldsubsection\subsection
+\renewcommand\subsection[2][]
+{
+	\protect\oldsubsection{#2}
+	\ifstrempty{#1}{\protect\label{sec:#2}}{\protect\label{sec:#1}}
+}
+
+%--
+%	Auto label subsubsection with proper prefix
+%	Param
+%	#1: Label name. If not given, #2 will be used
+%	#2:	The shown name
+%--
+\let\oldsubsubsection\subsubsection
+\renewcommand\subsubsection[2][]
+{
+	\protect\oldsubsubsection{#2}
+	\ifstrempty{#1}{\protect\label{sec:#2}}{\protect\label{sec:#1}}
+}
+
+%--
+%	Auto label paragraph with proper prefix
+%	Param
+%	#1: Label name. If not given, #2 will be used
+%	#2:	The shown name
+%--
+\let\oldparagraph\paragraph
+\renewcommand\paragraph[2][]
+{
+	\protect\oldparagraph{#2}
+	\ifstrempty{#1}{\protect\label{sec:#2}}{\protect\label{sec:#1}}
+}
+
+%----------- 2 Environment
+
+%--
+%	Environment for code listings. Used for proper labelling
+%	Param
+%	#1: Additional key-value pair
+%	#2:	Caption name
+%	#3: Label name, automatically prefixed
+%--
+\lstnewenvironment{code}[3][]
+{
+	\lstset{
+		caption=#2,
+		label=code:#3,
+		#1
+	}
+}{}

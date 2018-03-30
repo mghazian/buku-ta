@@ -1,0 +1,883 @@
+\chapter {DASAR TEORI}
+
+Pada bab ini, dasar teori yang digunakan sebagai landasan pengerjaan tugas akhir ini akan dijabarkan.
+
+\section{Deskripsi Soal}
+
+Permasalahan yang akan dibahas adalah melakukan pemalsuan \textit{signature}, yaitu membuat pasangan nilai $ (r, s) $.
+
+\subsection{Parameter Masukan}
+
+Soal meminta untuk dibuatkan sebuah \textit{signature} yang valid berdasarkan parameter berikut:
+\begin{enumerate}
+\item N. $3 \leq N \leq 36$
+\item L. $6 \leq L \leq 60$, $L \geq N + 3$
+\item q, sebuah bilangan prima sepanjang N-bit
+\item p, sebuah bilangan prima sepanjang L-bit dimana p-1 habis dibagi q
+\item g, sebuah generator dengan \textit{multiplicative order mod p} sebesar q, $1 < g < p$
+\item y, hasil persamaan $g^x\ mod\ p$ untuk $x$ tertentu, $0 \leq y < p$
+\item Hm, sebuah hash pesan yang memiliki panjang N-bit
+\end{enumerate}
+
+Parameter yang diberikan dibentuk dengan mengikuti langkah berikut.
+\begin{enumerate}
+\item Tentukan fungsi \textit{hash} yang dapat digunakan untuk kriptografi H (contohnya SHA-2). Keluaran fungsi \textit{hash} dapat dipangkas agar panjangnya sama dengan ukuran pasangan kunci.
+\item Tentukan panjang kunci L dan N.
+\item Tentukan sebuah bilangan prima sepanjang N-bit, q. N harus kurang dari atau sama dengan panjang keluaran fungsi \textit{hash}.
+\item Tentukan sebuah bilangan modulus prima sepanjang L-bit p dengan ketentuan p-1 merupakan kelipatan q.
+\item Tentukan sebuah nilai g, sebuah bilangan dengan \textit{multiplicative order modulo p} sebesar q.
+\item Tentukan sebuah nilai x secara acak dimana $0 < x < q$.
+\item Hitung $y = g^x (mod\ p)$.
+\item \textit{Public key} adalah $\left(p,\ q,\ g,\ y\right)$, dan \textit{private key} adalah $x$.
+\end{enumerate}
+
+\subsection {Batasan Permasalahan}
+
+Batasan yang diberikan soal adalah batas runtime 1 detik, dan batas penggunaan memori 64 MB.
+
+\subsection {Keluaran Permasalahan}
+
+\textit{Signature} yang valid dibentuk dengan langkah berikut:
+\begin{enumerate}
+\item Buat sebuah nilai k secara acak dimana $0 < k < q$
+\item Hitung nilai $r = \left(g^k\ mod\ p\right) mod\ q$.
+\item Apabila nilai $r = 0$, ulangi langkah 1 dengan nilai k yang berbeda.
+\item Hitung nilai $s = k^{-1}\left(H(m) + xr\right) mod\ q$.
+\item Apabila nilai $s = 0$, ulangi langkah 1 dengan nilai k yang berbeda.
+\item Keluarkan pasangan nilai $(r, s)$
+\end{enumerate}
+
+\subsection {Lain-lain}
+Kebenaran \textit{signature} yang telah dibuat bisa diverifikasi dengan melakukan prosedur berikut:
+
+\begin{enumerate}
+\item Tolak \textit{signature} apabila syarat $0 < r < q$ atau $0 < s < q$ tidak terpenuhi.
+\item Hitung $w = s^{-1}\ mod\ q$.
+\item Hitung $u_1 = H(m) w\ mod\ q$.
+\item Hitung $u_2 = r w\ mod\ q$.
+\item Hitung $v = \left(\left(g^{u_1} y^{u_2}\right) mod\ p\right) mod\ q$.
+\item \textit{Signature} sah apabila $v == r$
+\end{enumerate}
+
+\section{Deskripsi Umum}
+
+Subbab ini akan memaparkan definisi, deskripsi dan landasan yang akan digunakan pada keseluruhan penyelesaian masalah.
+
+\subsection{Logaritma Diskret}
+Logaritma Diskret merupakan nilai $ x $ pada persamaan \eqref{eq:persamaan_umum_log_diskret}.
+\begin{equation}
+y = g^{x}\ (mod\ n),\text{untuk nilai y, g dan n tertentu}
+\label{eq:persamaan_umum_log_diskret}
+\end{equation}
+
+\subsection{Modulus}
+Operasi pembagian dua bilangan $\frac{a}{b}$ pada dasarnya merupakan persamaan \eqref{eq:persamaan_umum_pembagian}.
+\begin{equation}
+a=qb+r
+\label{eq:persamaan_umum_pembagian}
+\end{equation}
+
+Nilai $q$ pada persamaan \eqref{eq:persamaan_umum_pembagian} disebut dengan \textit{quotient}. Nilai ini adalah hasil bagi $\frac{a}{b}$. Sedangkan nilai $r$ pada persamaan \eqref{eq:persamaan_umum_pembagian} disebut dengan \textit{remainder} atau \textit{modulus}. Nilai ini adalah sisa bagi $\frac{a}{b}$. Pada aritmatika modular, hal yang seringkali disorot adalah \textit{modulus}. Informasi lebih lengkap mengenai konsep modulus dapat merujuk pada \cite{stallings_cryptography}. Notasi yang umum digunakan pada aritmatika modular bisa dilihat pada persamaan \eqref{eq:notasi_mod}.
+\begin{equation}
+a\ mod\ b=c
+\label{eq:notasi_mod}
+\end{equation}
+dimana $c$ adalah nilai $r$ pada persamaan \eqref{eq:persamaan_umum_pembagian}. Beberapa contoh bisa dilihat di bawah.
+\begin{align*}
+18\ mod\ 13 & = 5 \\
+20\ mod\ 7 & = 6
+\end{align*}
+
+\subsection{Kongruensi}
+Kongruensi, hubungannya dengan aritmatika modular, adalah kesamaan nilai \textit{modulus} dua bilangan terhadap sebuah nilai pembagi. Dengan kata lain, dua buah bilangan, $a$ dan $b$, memiliki kongruensi (atau cukup disebut kongruen) terhadap sebuah nilai $n$ apabila $a\ mod\ n=b\ mod\ n$. Notasi yang umum digunakan untuk menggambarkan kongruensi dapat dilihat pada persamaan \eqref{eq:kongruensi}.
+\begin{equation}
+a\equiv b\ (mod\ n)
+\label{eq:kongruensi}
+\end{equation}
+
+Kongruensi memiliki beberapa sifat.\cite{stallings_cryptography}
+\begin{enumerate}
+\item $a\equiv b\ (mod\ n)$ apabila $n|(a - b)$, yaitu $n$ habis membagi $a-b$.
+\item Kongruensi bersifat komutatif. Yaitu $a\equiv b\ (mod\ n)$ mengindikasikan bahwa $b\equiv a\ (mod\ n)$.
+\item Kongruensi bersifat transitif. Yaitu $a\equiv b\ (mod\ n)$ dan $b\equiv c\ (mod\ n)$ mengindikasikan bahwa $a\equiv c\ (mod\ n)$.
+\end{enumerate}
+Sisi kanan pada kongruensi $a\equiv b\ (mod\ n)$ tidak harus berada pada rentang $0\le b<n$.
+
+Perhatikan bahwa penggunaan notasi \textit{mod} memiliki dua makna:
+\begin{enumerate}
+\item Pada persamaan $a\ mod\ b = c$, operasi $mod$ merupakan operasi biner yang menghitung hasil bagi $a$ terhadap $b$ (yaitu sisa bagi $\frac{a}{b}$).
+\item Pada persamaan $a\equiv b\ (mod\ n)$, notasi $mod$ disini memiliki makna $a\ mod\ n=b\ mod\ n$.
+\end {enumerate}
+Sedangkan pada penggunaan non-notasi, definisi \textit{modulus} memiliki dua makna:
+\begin{enumerate}
+\item Basis kongruensi, yaitu nilai $n$ pada $a\equiv b\ (mod\ n)$
+\item Sisa bagi, yaitu nilai $c$ pada $a\ mod\ b=c$.
+\end{enumerate}
+
+Untuk selanjutnya, definisi \textit{modulus} yang digunakan adalah basis kongruensi. Untuk definisi sisa bagi, istilah \textit{remainder} akan digunakan.
+
+\subsection{Aritmatika Modular}
+Sistem kongruensi dapat dioperasikan menggunakan operasi matematika pada umumnya \cite{stallings_cryptography}, yaitu penjumlahan, pengurangan, perkalian, dan pembagian.
+\begin{enumerate}
+\item Penjumlahan \\
+Diberikan dua kongruensi dengan nilai \textit{modulus} yang sama, $a\ (mod\ n)$ dan $b\ (mod\ n)$,
+\begin{equation}
+a\ (mod\ n)+b\ (mod\ n)\equiv a+b\ (mod\ n)
+\label {eq:mod_jumlah}
+\end{equation}
+
+Persamaan \eqref{eq:mod_jumlah} dapat ditulis sebagai persamaan \eqref{eq:mod_jumlah_long}.
+\begin{equation}
+[a\ (mod\ n)+b\ (mod\ n)]\ (mod\ n)\equiv a+b\ (mod\ n)
+\label {eq:mod_jumlah_long}
+\end{equation}
+
+\item Pengurangan \\
+Diberikan dua kongruensi dengan nilai \textit{modulus} yang sama, $a\ (mod\ n)$ dan $b\ (mod\ n)$,
+\begin{equation}
+a\ (mod\ n)-b\ (mod\ n)\equiv a-b\ (mod\ n)
+\label{eq:mod_kurang}
+\end{equation}
+
+Persamaan \eqref{eq:mod_kurang} dapat ditulis sebagai persamaan \eqref{eq:mod_kurang_long}.
+\begin{equation}
+[a\ (mod\ n)-b\ (mod\ n)]\ (mod\ n)\equiv a-b\ (mod\ n)
+\label {eq:mod_kurang_long}
+\end{equation}
+
+\item Perkalian \\
+Diberikan dua kongruensi dengan nilai \textit{modulus} yang sama, $a\ (mod\ n)$ dan $b\ (mod\ n)$,
+\begin{equation}
+a\ (mod\ n)*b\ (mod\ n)\equiv a*b\ (mod\ n)
+\label{eq:mod_kali}
+\end{equation}
+
+Persamaan \eqref{eq:mod_kali} dapat ditulis sebagai persamaan \eqref{eq:mod_kali_long}.
+\begin{equation}
+[a\ (mod\ n)*b\ (mod\ n)]\ (mod\ n)\equiv a*b\ (mod\ n)
+\label{eq:mod_kali_long}
+\end{equation}
+
+\end{enumerate}
+Operasi pembagian membutuhkan penjelasan lebih mendalam, dan akan dijelaskan pada subbab yang mendatang.
+
+\subsection{Kelas Residu}
+Apabila diberikan sistem kongruen $a\equiv b\ (mod\ n)$, nilai $b$ dapat diubah menjadi nilai yang berada pada rentang $0\le b<n$, mengingat sistem kongruen terbentuk dari persamaan \eqref{eq:kelas_residu_umum}
+\begin{equation}
+a=qn+b
+\label{eq:kelas_residu_umum}
+\end{equation}
+
+Diberikan suatu nilai $a$ dan $n$, terdapat banyak pasangan $(q,b)$ yang memenuhi persamaan \eqref{eq:kelas_residu_umum}. Namun ada satu pasangan yang memberikan nilai $b$ positif yang paling kecil, dimana $b$ berada pada rentang $0\le b<n$. Kesamaan nilai $b$ untuk nilai $n$ tertentu dan beberapa sembarang nilai $a$ dapat disampaikan dengan konsep kelas residu.
+Kelas residu adalah sebuah himpunan yang merepresentasikan sekumpulan nilai, dimana setiap nilai tersebut memiliki \textit{remainder} $b$ terhadap pembagi $n$ \cite{cormen_introduction,stallings_cryptography}. Nilai yang digunakan sebagai representasi umumnya bilangan non-negatif yang kurang dari $n$. Secara formal penjelasan ini dapat ditulis sebagai persamaan \eqref{eq:kelas_residu}
+\begin{equation}
+[r]_n=\{qn+r\ q\in \mathbb{Z}\}, \text{untuk sebuah nilai n tertentu}
+\label{eq:kelas_residu}
+\end{equation}
+
+Anggota tiap kelas residu kongruen terhadap satu sama lain. Contoh penggunaan kelas residu pada nilai pembagi $n = 7$ seperti:
+\begin{align*}
+18\ mod\ 7\in [4]_7. \quad& \text{Artinya 18 kongruen terhadap 4 (mod 7)} \\
+92\ mod\ 10\in [2]_{10}. \quad& \text{Artinya 92 kongruen terhadap 2 (mod 10)}
+\end{align*}
+
+Kelas residu akan digunakan untuk menyederhanakan penjelasan pada bahasan-bahasan selanjutnya. Semua nilai $a$ dan $b$ pada persamaan kongruensi \eqref{eq:kelas_residu_umum} akan diasumsikan bernilai $0\leq a,b < n$ untuk melambangkan bahwa $a$ dan $b$ merupakan anggota kelas residu tertentu, kecuali disebutkan sebaliknya secara eksplisit.
+
+\subsection{Sistem Residu}
+Sistem residu adalah sebuah himpunan yang anggotanya adalah kelas residu \cite{stallings_cryptography,cormen_introduction}. Sistem residu yang akan digunakan pada bahasan-bahasan selanjutnya adalah sistem residu yang anggotanya semua kelas residu dari 0 hingga $n - 1$. Pernyataan ini dapat dinyatakan secara formal menggunakan persamaan \eqref{eq:sistem_residu}
+\begin{equation}
+\mathbb{Z}_n=\left\lbrace[0]_n,[1]_n,\dots,[n-1]_n\right\rbrace
+\label{eq:sistem_residu}
+\end{equation}
+
+\section {Strategi Penyelesaian Umum}
+Tujuan permasalahan ini adalah membuat sepasang nilai \textit{(r, s)} menurut prosedur yang dijelaskan. Berdasarkan prosedur pada subbab \ref{sec:Keluaran Permasalahan}, beberapa variabel disebutkan, diantaranya $q$, $p$, $g$, $Hm$, $k$, $r$, $s$, dan $x$. Untuk variabel $q$, $p$, $g$, dan $Hm$, nilai variabel tersebut telah diberikan oleh soal sebagai parameter masukan. Untuk variabel $k$, $r$, dan $s$, nilai variabel tersebut terbentuk seiring proses \textit{signing}. Hanya nilai $x$ yang tidak diberikan oleh soal maupun tidak terdefinisi pada prosedur \textit{signing}. Namun untuk nilai $x$, soal memberikan penjelasan bagaimana nilai $x$ terbentuk.
+\begin{enumerate}
+\item Tentukan nilai $x$ secara acak dimana $0 < x < q$.
+\item Hitung $y = g^x\ mod\ p$.
+\item Nilai \textit{public key} adalah $(p, q, g, y)$. Nilai \textit{private key} adalah $x$.
+\end{enumerate}
+Untuk mampu membuat \textit{signature}, terlebih dahulu dicari nilai $x$ pada persamaan $y=g^x\ mod\ p$. Cara menemukan nilai $x$ pada persamaan tersebut akan dijelaskan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret}. Setelah menemukan nilai $x$, langkah selanjutnya cukup mengikuti proses yang dijelaskan pada soal.
+
+Ringkasnya, permasalahan ini dapat diselesaikan dengan prosedur di gambar \ref{fig:main_diagram}.
+\begin{figure}
+	\Centering
+	\includegraphics [scale=0.5]{bab2/img/main-diagram}
+	\caption {Diagram Alur Penyelesaian Permasalahan}
+	\label {fig:main_diagram}
+\end{figure}
+Terdapat beberapa \textit{bottleneck} pada prosedur pembuatan signature, di antaranya penghitungan logaritma diskret y, penghitungan nilai $g^k\ mod\ p$, dan penghitungan invers $k\ \left(mod\ p\right)$. Selain proses yang telah dipaparkan pada gambar \ref{fig:main_diagram}, terdapat sebuah proses yang merentang di tiap tahapan pembuatan \textit{signature}.
+
+Soal menyiratkan bahwa parameter $p$ memiliki nilai paling tinggi sekitar $2^{60}$ sedangkan pada waktu penulisan, nilai \textit{integer} yang paling besar yang dapat ditampung pada mesin adalah $2^{64}$. Konsekuensi tingginya parameter $p$ adalah akan ada parameter lain yang memiliki batas atas nilai yang tinggi pula. Hal ini dapat menyebabkan masalah pada saat melakukan perkalian.
+
+Perkalian dua nilai yang mendekati $2^{60}$ dapat mengakibatkan \textit{integer overflow}. Maka pada proses perkalian di seluruh tahapan pembuatan \textit{signature}, prosedur perkalian harus menggunakan metode yang dapat menghindari \textit{integer overflow}. Strategi untuk mengatasi \textit{bottleneck} yang telah disebutkan akan dijelaskan pada subbab berikutnya.
+
+\section{Strategi Penyelesaian Pemangkatan Modular}
+Bagian ini akan menjelaskan beberapa variasi penyelesaian pencarian hasil pemangkatan pada persamaan kongruen yang dijabarkan pada persamaan \ref{eq:pemangkatan_modular}.
+\begin{equation}
+g^k\in h\ mod\ p,\text{untuk g, k, dan p yang ditentukan}
+\label{eq:pemangkatan_modular}
+\end{equation}
+
+\subsection{Strategi Penyelesaian Pemangkatan Modular secara Naif}
+Pencarian hasil persamaan \eqref{eq:pemangkatan_modular} dapat dicari secara iteratif. Hasil perkalian disimpan pada sebuah variabel sementara, $y$. Nilai $y$ secara berkala dikalikan dengan $g$ sebanyak $k$ kali. Setelah pemangkatan selesai dilakukan, nilai $y$ dimodulus dengan $p$. Prosedur ini ditunjukkan pada pseudocode \ref{psdo:modex_naive}.
+
+\begin{figure}
+\begin{lstlisting}[firstnumber=0]
+NAIVE-MODULAR-EXPONENTIATION (g, k, p)
+let result = 1
+for i = 1 to k
+result = result * g
+result = result mod p
+return h
+\end{lstlisting}
+\caption{Pseudocode Penyelesaian Pemangkatan Modular Secara Naif}
+\label{psdo:modex_naive}
+\end{figure}
+
+Strategi ini membutuhkan $O(k)$ iterasi. Untuk nilai $k$ yang besar, metode ini tidak cukup baik untuk digunakan mengingat ada tahapan lain yang membutuhkan waktu komputasi yang tinggi. Untuk itu sebuah strategi alternatif akan diajukan pada subbab \ref{sec:Strategi Penyelesaian Pemangkatan Modular dengan Repeated Squaring}.
+
+\subsection{Strategi Penyelesaian Pemangkatan Modular dengan Repeated Squaring}
+
+Metode ini memanfaatkan representasi biner indeks pangkat $k$ dalam melakukan pemangkatan. Diberikan tiga masukan: \textit{generator}, \textit{exponent}, dan $p$. Gambar \ref{fig:repeated_squaring} menjabarkan prosedur metode ini.
+\begin{figure}
+	\Centering
+	\includegraphics[scale=0.5,angle=90]{bab2/img/modular-exponentiation}
+	\caption{Diagram Alur Pemangkatan Modular dengan \textit{Repeated Squaring}}
+	\label{fig:repeated_squaring}
+\end{figure}
+
+Strategi ini memiliki kompleksitas $O\left(log_2\ p\right)$.
+
+\subsection{Penjelasan Strategi Penyelesaian Pemangkatan Modular dengan Repeated Squaring}
+
+Strategi ini berangkat dari perkalian berulang sebuah nilai $g$ sebanyak $k$ kali. Dengan kata lain, dibutuhkan $k$ proses perkalian dengan nilai $g$. Hal ini ditunjukkan pada strategi pemangkatan modular naif. Kendati begitu, ada cara lain dimana walaupun proses pemangkatan membutuhkan $k$ proses perkalian, pada praktiknya proses perkalian yang terjadi tidak sampai $k$ kali.
+
+Ide strategi ini adalah dengan memecah pemangkatan menjadi komponen yang lebih kecil. Pemecahan tersebut ditunjukkan pada persamaan \eqref{eq:dekomposisi_eksponen}.
+\begin{equation}
+g^q = g^{e_1} * g^{e_2} *\ldots*g^{e_n},\ dimana\ q=e_1+e_2+\ldots+e_n
+\label{eq:dekomposisi_eksponen}
+\end{equation}
+
+Setelah ini akan dijelaskan mengenai nilai $e_i$. 
+
+Pemangkatan memiliki sifat-sifat operasi layaknya aritmatika pada umumnya, dengan syarat basis pemangkatan harus sama. Strategi ini memanfaatkan sifat perkalian indeks pemangkatan seperti yang ditunjukkan pada persamaan \eqref{eq:dekomposisi_perkalian_indeks_pangkat}.
+\begin{equation}
+g^r = g^{a*b} = (g^a)^b
+\label{eq:dekomposisi_perkalian_indeks_pangkat}
+\end{equation}
+
+Substitusi nilai $a$ menjadi $ \frac{r}{2} $ dan $b$ menjadi $2$.
+\begin{equation}
+g^r = g^{\frac{r}{2}*2} = (g^{\frac{r}{2}} )^2
+\label{eq:substitusi_indeks_pangkat}
+\end{equation}
+
+Penghitungan nilai $ g^{\frac{r}{2}} $ dilakukan dengan menggunakan bentuk persamaan \eqref{eq:substitusi_indeks_pangkat}, hingga didapat nilai $ \displaystyle \frac{r}{2} = 1$. Perkalian secara rekursif ini memiliki jumlah perkalian mengikuti relasi rekurens berikut.
+\begin{subequations}
+	\[
+		O(r)=
+		\begin{cases}
+			O(1), 			  & \text{if } r = 1 \\
+			O(\frac{r}{2}+1), & \text{if } r > 1
+		\end{cases}
+		\tag{\ref{eq:rekurens_jumlah_perkalian}}
+	\]
+	\label{eq:rekurens_jumlah_perkalian}
+\end{subequations}
+
+Berdasarkan relasi rekurens \eqref{eq:rekurens_jumlah_perkalian}, jumlah perkalian yang dibutuhkan untuk melakukan pemangkatan dengan metode ini adalah $O(log_2\ r)$ dimana $r$ merupakan bilangan pangkat 2.
+
+Telah dijelaskan bagaimana mencari hasil pangkat dimana indeks pangkat $r$ berupa bilangan pangkat 2. Metode pemangkatan dengan \textit{repeated squaring} juga dapat digunakan untuk mencari hasil pangkat dengan indeks pangkat $ r $ bukan bilangan pangkat 2. Pertama, representasi biner dari $ q $ dicari terlebih dahulu. Diberikan sebuah representasi biner $ \left\langle a_0,a_1,\dots,a_n\right\rangle $, representasi ini dapat ditransformasikan menjadi sebuah nilai $ q $ dengan persamaan \eqref{eq:dekomposisi_biner}.
+\begin{equation}
+q = (2^0 * a_0) + (2^1* a_1) + (2^2*a_2) + \dots + (2^n* a_n)
+\label{eq:dekomposisi_biner}
+\end{equation}
+
+Persamaan di atas kemudian dimasukkan ke $ g^q $ menjadi
+\begin{align}
+g^q &= g^{(2^0 * a_0) + (2^1 * a_1) + (2^2 * a_2) + \dots + (2^n * a_n)} \\
+g^q &= g^{2^0 * a_0} * g^{2^1 * a_1} * g^{2^2 * a_2} * \dots * g^{2^n * a_n} \\ 
+g^q &= (g^{2^0})^{a_0} * (g^{2^1})^{a_1} * (g^{2^2})^{a_2} * \dots * (g^{2^n})^{a_n} \\
+g^q &= (g^1)^{a_0} * (g^2)^{a_1} * (g^4)^{a_2} * \dots * (g^{2^{log_2\ q}})^{a_n} \\
+g^q &= y_0^{a_0} * y_1^{a_1} * y_2^{a_2} * \dots * y_n^{a_n},\text{untuk } y_i=g^{2^i}
+\label{eq:generalisasi_dekomposisi_biner_pemangkatan}
+\end{align}
+
+Persamaan \eqref{eq:generalisasi_dekomposisi_biner_pemangkatan} menunjukkan transformasi penghitungan pemangkatan dengan $ q $ menjadi sederet perkalian. Perlu diperhatikan bahwa penghitungan nilai $ (g^2)^i $ membutuhkan $ O(log_2\ 2^i) $ perkalian. Maka penghitungan $ y_i=g^{2^i} $ juga membutuhkan $ O(log_2\ 2^i) $ perkalian. Dari penjabaran ini, untuk menghitung semua nilai $ y_i $ pada persamaan \eqref{eq:generalisasi_dekomposisi_biner_pemangkatan} membutuhkan perkalian sebanyak
+\begin{equation}
+\sum_{i=1}^{n} log_2\ {2^i}=\sum_{i=1}^{n} i=\frac{n(n+1)}{2}
+\label{eq:jumlah_perkalian_generalisasi_dekomposisi_biner}
+\end{equation}
+
+Perhatikan bahwa $ y_0 $ tidak diikutsertakan pada penghitungan karena $ y_0=g^{2^0}=g^1 $, sehingga tidak dibutuhkan perkalian apapun. Total perkalian yang dibutuhkan untuk menghitung $ y_i=g^{2^i} $ pada persamaan \eqref{eq:generalisasi_dekomposisi_biner_pemangkatan} adalah $ \frac{n(n+1)}{2} \in O(n^2) $. Metode ini tentu tidak lebih baik dari metode pemangkatan naif dimana dibutuhkan $ O\left(n\right) $ perkalian. Maka dari itu perlu dilakukan perubahan mengenai cara penghitungan $ y_i $.
+
+Untuk menekan jumlah perkalian, penghitungan $ y_i $ dapat diubah menjadi relasi rekurens \eqref{eq:relasi_rekurens_y_i}.
+\begin{subequations}
+	\[
+		y_i=
+		\begin{cases}
+			g, 		   & \text{if } i = 0 \\
+			y_{i-1}*g, & \text{if } i > 0
+		\end{cases}
+		\tag{\ref{eq:relasi_rekurens_y_i}}
+	\]
+	\label{eq:relasi_rekurens_y_i}
+\end{subequations}
+
+Untuk mencari nilai $ y_i $, cukup menggunakan nilai $ y_{i-1} $ dan dikalikan dengan $ g $. Konsekuensi yang dimiliki cara ini adalah nilai $ y_i $ dapat digunakan untuk mendapatkan nilai $ y_{i+1} $. Maka sebetulnya untuk menghitung nilai $ y_i $, tidak perlu menghitung dari $ y_0 $. Apabila nilai $ y_{i-1} $ sudah diketahui, cukup mengalikan nilai tersebut dengan $ g $.
+
+Pemanfaatan relasi rekurens \eqref{eq:relasi_rekurens_y_i} dapat dilakukan dengan menggunakan sebuah variabel penyimpan nilai $ y_i $ dan sebuah variabel penyimpan hasil perkalian. Mulai dari $ i=0 $, pangkatkan $ y_i $ dengan $ a_i $. Pemangkatan ini hanya memiliki dua hasil seperti yang ditunjukkan pada persamaan \eqref{eq:hasil_relasi_rekurens_y_i}.
+\begin{subequations}
+	\[f_y(i)=
+		\begin{cases}
+			1,  & \text{if } a_i=0 \\
+			y_i,& \text{if } a_i=1
+		\end{cases}
+		\tag{\ref{eq:hasil_relasi_rekurens_y_i}}
+	\]
+	\label{eq:hasil_relasi_rekurens_y_i}
+\end{subequations}
+Hasil pemangkatan (yaitu nilai $ f_y(i) $) digabungkan ke variabel penyimpan hasil dengan cara dikalikan.
+
+Dari penjabaran tersebut, penghitungan persamaan \eqref{eq:generalisasi_dekomposisi_biner_pemangkatan} dengan metode ini membutuhkan hanya satu kali perhitungan nilai $ y_i $, yaitu penghitungan $ y_i $ pada $ i=n $. Proses penghitungan $ y_n $ juga menghitung nilai $ y_0 $ hingga $ y_{n-1} $. Sehingga dengan menghitung $ y_n $, nilai $ y_0 $ hingga $ y_{n-1} $ juga didapat. Jumlah perkalian menggunakan relasi rekurens \eqref{eq:relasi_rekurens_y_i} adalah $ O(n) $ dimana $ n=log_2\ x$ untuk sebuah indeks pangkat $ x $ (atau bisa ditulis $ O\left(log_2\ (x)\right) $). Cara pemangkatan ini lebih cepat dibandingkan cara pemangkatan naif.
+
+\section{Strategi Penyelesaian Invers Modulus}
+
+Permasalahan pencarian invers modulus adalah mencari nilai k pada persamaan \eqref{eq:persamaan_umum_invers_modulus}.
+\begin{equation}
+g*k \equiv 1\ (mod\ n), \text{untuk nilai g dan n tertentu}
+\label{eq:persamaan_umum_invers_modulus}
+\end{equation}
+Invers modulus adalah analog dari pembagian pada $ \mathbb{Z}_n $.
+
+Sebelum mencari nilai $ k $, hal yang perlu diketahui terlebih dahulu adalah apakah benar ada nilai $ k $ yang bisa membuat persamaan \eqref{eq:persamaan_umum_invers_modulus} bernilai benar. Pertanyaan ini bisa dijawab dengan menggunakan Identitas Bezout.
+
+\subsection{Identitas Bezout}
+
+Identitas Bezout berbicara mengenai persamaan berkaitan dengan faktor persekutuan terbesar dua bilangan \cite{brilliant_bezout}. Notasi yang digunakan untuk menyatakan faktor persekutuan terbesar dapat dilihat pada persamaan \eqref{eq:gcd}.
+\begin{equation}
+\gcd⁡(a,b)=\max R,\ R=\left\{r:r|a\ dan\ r|b\right\}
+\label{eq:gcd}
+\end{equation}
+
+Identitas Bezout adalah sebuah persamaan yang menghasilkan faktor persekutuan terbesar dua bilangan.
+\begin{equation}
+ax+by=\gcd(a,b), \text{untuk nilai a dan b tertentu}
+\label{eq:identitas_bezout}
+\end{equation}
+Sisi kanan persamaan \eqref{eq:identitas_bezout} tidak akan memiliki nilai kurang dari $ \gcd (a,b) $. Dengan kata lain nilai terkecil bukan nol yang mungkin untuk sisi kanan persamaan \eqref{eq:identitas_bezout} adalah $ \gcd (a,b) $.
+
+Kembali ke persamaan \eqref{eq:persamaan_umum_invers_modulus}, Identitas Bezout menjamin adanya sebuah nilai $ k $ yang menyebabkan persamaan \eqref{eq:persamaan_umum_invers_modulus} bernilai benar dengan syarat $ \gcd (g,n) = 1 $. Pembuktian klaim ini dapat dilihat pada penjabaran berikut.
+\begin{align}
+g*k &\equiv 1\ (mod\ n) \\
+gk &= qn+1 \\
+1 &= gk + (-q)n
+\label{eq:proof_bezout_koprima}
+\end{align}
+Persamaan \eqref{eq:proof_bezout_koprima} memiliki bentuk persamaan \eqref{eq:identitas_bezout}. Sisi kiri persamaan \eqref{eq:proof_bezout_koprima} merupakan sisi kanan persamaan \eqref{eq:identitas_bezout}, atau dengan kata lain $ \gcd (g, n) = 1 $. Perhatikan bahwa hasil akhir penjabaran di atas merupakan persamaan \eqref{eq:identitas_bezout}, yaitu Identitas Bezout. Dari sini dapat disimpulkan bahwa $ \gcd (g, n)=1 $. Artinya syarat untuk sebuah nilai $ k $ memiliki invers modulus adalah $ k $ harus koprima dengan modulus $ n $. \hfill $ \eop $
+
+\subsection{Strategi Penyelesaian Invers Modulus secara Naif}
+
+Pencarian invers modulus dapat dilakukan dengan \textit{brute force}. Semua nilai $ k $ dicoba dan diperiksa apakah hasil perkalian persamaan \eqref{eq:persamaan_umum_invers_modulus} menghasilkan $ 1\ (mod\ n) $. Gambar \ref{psdo:modinv_naive} memaparkan langkah yang dijelaskan.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+NAIVE-MODULAR-INVERSE (g, n)
+if gcd(g,n) != 1
+return “NOT INVERTIBLE”
+for k = 1 to n-1
+if (g * k) mod n == 1
+return k
+\end{lstlisting}
+\caption{Pseudocode Pencarian Modular Invers Naif}
+\label{psdo:modinv_naive}
+\end{figure}
+
+Strategi ini membutuhkan $ O(n) $ percobaan. Strategi ini mudah untuk diimplementasikan karena cukup mencoba nilai $ k $ satu per satu hingga ditemukan nilai $ k $ yang memenuhi persamaan \eqref{eq:persamaan_umum_invers_modulus}. Untuk mereduksi daerah pencarian, pencarian invers modulus dapat dibatasi supaya hanya dilakukan untuk pasangan $g$ dan $n$ dimana $ \gcd⁡(g,n)=1$. Untuk $ n $ yang besar, strategi ini tidak cukup baik untuk digunakan mengingat masih ada proses lain yang membutuhkan waktu komputasi yang tinggi. Maka dari itu, strategi lain yang lebih baik akan dijabarkan pada subbab selanjutnya.
+
+\subsection {Strategi Penyelesaian Invers Modulus dengan Extended Euclidean}
+
+Strategi ini memanfaatkan Identitas Bezout, yaitu mencari nilai $ a $ dan $ b $ untuk $ x $ dan $ y $ tertentu pada persamaan \eqref{eq:identitas_bezout}. Gambar \ref{psdo:extended_euclidean} merupakan pseudocode yang menggambarkan metode pencarian invers modulus menggunakan \textit{Extended Eucliean}.
+
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+MODULAR-INVERSE-WITH-EXTENDED-EUCLIDEAN (a = qb + r)
+let EQUATION[] be a new array
+let i = 0
+while r != 0
+EQUATION[i] = (a = qb + r)
+find equation b = qr + m for some q and m
+i = i + 1
+for i = EQUATION.len – 1 downto 1
+substitute EQUATION[i].b with EQUATION[i+1].r
+return (EQUATION[1].x, EQUATION[1].y)
+\end{lstlisting}
+\caption{Pseudocode \textit{Extended Euclidean}}
+\label{psdo:extended_euclidean}
+\end{figure}
+
+Strategi ini membutuhkan $ O((log_2\ n)^2) $ operasi bit. \cite{hac_math}
+
+\subsection{Penjelasan Strategi Penyelesaian Invers Modulus dengan Extended Euclidean}
+
+Ide strategi ini adalah dengan mentransformasi nilai $ a $ dan $ b $ menjadi sebuah nilai dimana $ a $ habis dibagi oleh $ b $. Tiap langkah transformasi akan ditulis menggunakan persamaan \eqref{eq:persamaan_umum_pembagian}, yaitu bentuk umum pembagian.
+\begin{equation*}
+a=qb+r
+\end{equation*}
+
+Persamaan \eqref{eq:persamaan_umum_pembagian} diberi batasan, yaitu nilai $ r $ harus kurang dari $ b $. Langkah transformasi adalah sebagai berikut.
+\begin{enumerate}
+\item Cari nilai $ q $ dan $ r $ yang memenuhi persamaan \eqref{eq:persamaan_umum_pembagian}.
+\item Cari bentuk persamaan \eqref{eq:persamaan_umum_pembagian} untuk $ b $ dengan cara melakukan modulus $ b $ dengan $ r $
+\item Ulangi langkah 2 hingga ditemukan $ r $ bernilai 0.
+\end{enumerate}
+
+Tabel \ref{tab:transformasi_ext_euclid} mengilustrasikan langkah ini. Diberikan $ a = 97 $ dan $ b = 35 $. Nilai $ q $ sengaja tidak dimasukkan pada kolom \textit{persamaan} untuk memperjelas bentuk persamaan \eqref{eq:persamaan_umum_pembagian}
+\begin{table}[h!]
+\Centering
+\caption{Contoh Proses Transformasi}
+\label{tab:transformasi_ext_euclid}
+\begin{tabular}{ |l|l|l|l|l|l| }
+	\hline
+	Iterasi	& a		& b		& r		& q		& Persamaan \\
+	\hline
+	1		& 97	& 35	& 27	& 2		& $ 97 = 35 * q + 27 $ \\
+	2		& 35	& 27	& 8		& 1		& $ 35 = 27 * q + 8 $ \\
+	3		& 27	& 8		& 3		& 3		& $ 27 = 8 * q + 3 $ \\
+	4		& 8		& 3		& 2		& 2		& $ 8 = 3 * q + 2 $ \\
+	5		& 3		& 2		& 1		& 1		& $ 3 = 2 * q + 1 $ \\
+	6		& 2		& 1		& 0		& 2		& $ 2 = 1 * q + 0 $ \\
+	\hline
+\end{tabular}
+\end{table}
+
+Pada iterasi 6, didapat nilai $ r = 0 $. Maka proses transformasi berhenti pada iterasi ini. Kemudian, dengan persamaan yang telah terbentuk di tiap iterasi, setiap persamaan dapat diangkat ke persamaan pada satu iterasi sebelumnya dengan cara substitusi. Berikut contoh pengangkatan iterasi 6 ke iterasi 5.
+\begin{align}
+2 &=1(2)+0 \label{eq:contoh_pengangkatan_1} \\
+0 &=2-1(2) \label{eq:contoh_pengangkatan_2} \\
+0 &=2-(3-2(1))(2) \label{eq:contoh_pengangkatan_3} \\
+0 &=2-3(2)+2(2) \label{eq:contoh_pengangkatan_4} \\
+0 &=2(3)-3(2) \label{eq:contoh_pengangkatan_5}
+\end{align}
+
+Hasil akhir pengangkatan tersebut (persamaan \eqref{eq:contoh_pengangkatan_5}) adalah bentuk persamaan pada iterasi 5, hanya saja nilai pada sisi kiri persamaan tertambah perkalian dengan 2 (persamaan \eqref{eq:contoh_pengangkatan_5} dapat ditulis menjadi $ 3(2)=2(2)+0 $).
+
+Perhatikan penggunaan tanda kurung pada proses pengangkatan. Nilai pada tanda kurung bermakna variabel, sedangkan nilai yang berada di luar kurung bermakna koefisien. Pada proses pengangkatan, substitusi persamaan dengan persamaan pada iterasi lain hanya boleh dilakukan pada koefisien. Namun, penyederhanaan persamaan tidak boleh mengubah konstanta. Artinya, penyederhanaan persamaan hanya bekerja pada variabel.
+
+Di baris ketiga contoh pengangkatan (persamaan \eqref{eq:contoh_pengangkatan_3}) merupakan proses substitusi. Nilai $ 1 $ diubah menjadi $ 3-2(1) $. Kemudian, dilakukan distribusi untuk mengeluarkan persamaan substitusi dari kurung. Pada baris kelima contoh pengangkatan di atas merupakan proses penyederhanaan. Perhatikan bagaimana nilai $ 2 $ tidak digabungkan ke $ 3(2) $, melainkan ke $ 2(2) $. Hal ini disebabkan nilai $ 3(2) $ memiliki koefisien $ 3 $, sedangkan nilai yang akan digabungkan memiliki koefisien $ 2 $. Untuk itu, nilai $ 2 $ dimasukkan ke nilai yang sama-sama memiliki koefisien $ 2 $.
+
+Pengangkatan dilakukan dari iterasi sebelum iterasi terakhir. Pada contoh di atas, iterasi terakhir terdapat pada iterasi ke-6. Maka iterasi sebelum iterasi terakhir adalah iterasi ke-5. Hal ini bertujuan agar persamaan \eqref{eq:identitas_bezout} terpenuhi. Proses pengangkatan dilakukan hingga iterasi pertama.
+
+Langkah seluruh pengangkatan dapat dijabarkan sebagai berikut.
+\begin{enumerate}
+\item Ubah semua persamaan $ a=qb+r $ menjadi $ r=a-qb $.
+\item Substitusi nilai $ b $ pada iterasi sekarang dengan nilai $ r $ pada iterasi selanjutnya.
+\item Lakukan penyederhanaan dengan menggabungkan konstanta yang sama
+\item Ulangi langkah 2 dan 3 hingga seluruh iterasi telah dilewati.
+\end{enumerate}
+
+Tabel \ref{tab:pengangkatan_ext_euclid} berisi contoh pengangkatan berdasarkan hasil transformasi sebelumnya.
+
+\begin{table}[h!]
+\small
+\Centering
+\caption{Contoh Proses Pengangkatan}
+\label{tab:pengangkatan_ext_euclid}
+\begin{tabular} { |l|l|l|l|l|l|l| }
+	\hline
+	Iterasi	& a		& b		& r		& q		& Persamaan			& Pers. Akhir \\
+	\hline
+	5		& 3		& 2		& 1		& 1		& $ 1 = 3 - 2(1) $		& $ 1 = 3 - 2(1) $ \\
+	4		& 8		& 3		& 2		& 2		& $ 2 = 8 - 3(2) $		& $ 1 = 3(3) - 8(1) $ \\
+	3		& 27	& 8		& 3		& 3		& $ 3 = 27 - 8(3) $ 	& $ 1 = 27(3) - 8(10) $ \\
+	2		& 35	& 27	& 8		& 1		& $ 8 = 35 - 27(1) $	& $ 1 = 27(13) - 35(10) $ \\
+	1		& 97	& 35	& 27	& 2		& $ 27 = 97 - 35(2) $	& $ 1 = 97(13) - 35(36) $ \\
+	\hline
+\end{tabular}
+\end{table}
+
+Maka didapat persamaan akhir $ 1=97(13)-35(36) $. Persamaan ini dapat ditulis agar mengikuti persamaan \eqref{eq:identitas_bezout}. Penulisan persamaan tersebut yaitu $ 1=97(13)-35(36) \Rightarrow 1=97(13)+35(-36) $. Pasangan setiap konstanta -- variabel merupakan invers untuk satu sama lain. $ 97 $ merupakan invers dari $ 13 $, dan $ 35 $ merupakan invers dari $ -36 $. Seringkali nilai invers yang diinginkan berupa nilai positif. Untuk mengatasi hal itu, cukup mencari kelas residu dari $ -36 $. Pada kasus ini $ -36\in[3]_{13}$ dan $ -36\in[61]_{97} $. Maka $ -36\equiv3\ (mod\ 13) $ dan $ -36\equiv61\ (mod\ 97) $.
+Efisiensi strategi ini jauh lebih baik daripada strategi naif.
+
+\section{Strategi Penyelesaian Logaritma Diskret}
+
+Permasalahan logaritma diskret adalah mencari nilai x pada persamaan \eqref{eq:persamaan_umum_log_diskret}
+\[
+y = g^{x}\ (mod\ n),\text{untuk nilai y, g dan n tertentu}
+\]
+
+Penghitungan nilai logaritma diskret menjawab dua pertanyaan:
+\begin{enumerate}
+\item Apakah ada sebuah nilai $ x $ yang bisa menyebabkan persamaan \eqref{eq:persamaan_umum_log_diskret} benar?
+\item Nilai $ x $ apa yang mampu membuat persamaan \eqref{eq:persamaan_umum_log_diskret} benar?
+\end{enumerate}
+
+Pertanyaan 1 membutuhkan ulasan yang panjang. Penyebab panjangnya ulasan ini adalah ada permutasi $ g $, $ n $, dan $ y $ yang tidak menjamin terdapat nilai $ x $ yang bisa menyebabkan persamaan \eqref{eq:persamaan_umum_log_diskret} benar. Kendati begitu, pertanyaan 1 dapat dijawab secara ringkas dengan memperhatikan penjelasan soal. 
+
+Sebelumya disebutkan bahwa permutasi $ g $, $ n $, dan $ y $ menentukan ada atau tidaknya nilai $ x $ yang sesuai. Pada soal disebutkan bahwa parameter \textit{private key} dan \textit{public key} yang diberikan dijamin dibentuk dengan langkah berikut.
+
+\begin{enumerate}
+\item Tentukan sebuah nilai $ x $ secara acak dimana $ 0 < x < q $.
+\item Hitung $ y = g^x\ (mod\ p) $.
+\item \textit{Public key} adalah $ (p, q, g, y) $, dan \textit{private key} adalah $ x $.
+\end{enumerate}
+
+Artinya untuk \textit{public key} $ (p, q, g, y) $ dijamin terdapat sebuah \textit{private key} $ x $ yang cocok dengan \textit{public key} tersebut. Maka persamaan \eqref{eq:persamaan_umum_log_diskret} dijamin memiliki sebuah nilai $ x $ yang menyebabkan persamaan tersebut benar. Pertanyaan berikutnya adalah nilai $ x $ apa yang memenuhi persamaan \eqref{eq:persamaan_umum_log_diskret} (yaitu pertanyaan 2).
+
+Bab ini akan menjelaskan beberapa variasi penyelesaian logaritma diskret. Sebelum itu, perlu dijelaskan beberapa hal yang digunakan untuk menyelesaikan permasalahan logaritma diskret.
+
+\subsection {Teorema Euler}
+
+Teorema Euler berbicara mengenai periodisitas nilai hasil pemangkatan pada persamaan kongruensi. Teorema Euler menggunakan sebuah fungsi yang disebut \textit{Euler Totient Function}.\cite{stallings_cryptography}
+\begin{equation}
+\phi(n)=\left|S\right|, \text{dimana } S=\left\{r\ |\ \gcd (r,n)=1; 0 < r < n \right\}
+\label{eq:euler_totient_function}
+\end{equation}
+Perhatikan bahwa apabila $ n $ merupakan bilangan prima, maka $ \phi(n)=n-1 $.
+
+Teorema Euler dapat ditulis sebagai berikut.
+\begin{equation}
+a^{\phi(n)}\equiv 1\ (mod\ n), \qquad \gcd(a,n)=1
+\label{eq:teorema_euler}
+\end{equation}
+
+Persamaan \eqref{eq:teorema_euler} menjelaskan bahwa sebuah bilangan $ a $ dimana $ a $ koprima dengan $ n $, apabila dipangkatkan dengan $ \phi(n) $ akan menghasilkan nilai $ t \in [1]_n $. Artinya, $ a^{\phi(n)}\ mod\ n=1 $. Maksud persamaan \eqref{eq:teorema_euler} adalah apabila perkalian dengan $ a $ diulang sebanyak $ \phi(n) $ kali dimana $ n $ adalah modulus yang digunakan, semua nilai yang mungkin dari perkalian modular tersebut telah dihasilkan. Perkalian lebih lanjut hanya akan mengulang nilai-nilai tersebut.
+
+Persamaan \eqref{eq:teorema_euler} tidak menjamin seluruh anggota himpunan $ \mathbb{Z}_n^{*}=\left\{ r | 1 \leq r < n\right\} $ telah dihasilkan. Apa yang dijamin oleh persamaan \eqref{eq:teorema_euler} adalah terdapat sebuah himpunan $ H_a $ yang memenuhi persamaan \eqref{eq:himpunan_Ha}.
+\begin{equation}
+H_a=\left\{a^{r}\ (mod\ n)\ |\ 0 \leq r < \phi(n) \right\}, \text{untuk n tertentu}
+\label{eq:himpunan_Ha}
+\end{equation}
+Pada proses pemangkatan $ a^{\phi(n)} $, seluruh anggota himpunan $ H_a $ telah dihasilkan.
+
+Himpunan $ H_a $ tidak selalu sama dengan himpunan $ \mathbb{Z}_n^{*} $. Kasus yang menggambarkan pernyataan ini yaitu pemangkatan pada persamaan kongruensi modulo 7, dimana $ \phi(7)=\left|\left\{1,2,3,4,5,6\right\}\right|\allowbreak=6 $. Dengan mengambil contoh $ a=6 $, didapat bahwa himpunan $ H_{a=6}=\left\{1,6,1,6,1,6\right\} $ untuk $ n=7 $. Penjelasan lebih lanjut mengenai perbedaan himpunan $ H_a $ dengan $ \mathbb{Z}_n^{*} $ akan dijabarkan pada bab \ref{sec:Order Sebuah Elemen}.
+
+Persamaan \eqref{eq:teorema_euler} dapat diubah menjadi bentuk logaritmik.
+\begin{align}
+a^{\phi(n)} &\equiv 1\ (mod\ n) \\
+a^{\phi(n)} &\equiv a^0\ (mod\ n) \\
+\phi(n) &\equiv 0\ (mod\ \phi(n))
+\label{eq:teorema_euler_logaritmik}
+\end{align}
+
+Perhatikan perubahan persamaan \eqref{eq:teorema_euler} menjadi \eqref{eq:teorema_euler_logaritmik} mengubah nilai modulus. Hal ini disebabkan terdapat perubahan domain dimana persamaan \eqref{eq:teorema_euler_logaritmik} bekerja, yaitu dari domain hasil pemangkatan menjadi domain indeks pangkat. Teorema Euler memicu perubahan nilai modulus, dimana pemangkatan sebuah bilangan dengan $ \phi(n) $ bermakna sama dengan pemangkatan sebuah bilangan dengan $ 0 $. Penjelasan ini merupakan definisi persamaan \eqref{eq:teorema_euler_logaritmik}.
+
+\subsection{Order Sebuah Elemen}
+
+Definisi order sebuah elemen $ a $ adalah sebuah nilai $ h $ positif terkecil dimana apabila $ a $ dioperasikan dengan $ a $ sebanyak $ h $ kali akan menghasilkan elemen identitas operasi $ e $.\cite{harald_applied_number_theory}
+\begin{equation}
+ord(a)=h,\text{ dimana }\underbrace{a\cdot a\cdot\ldots\cdot a\cdot a}_{\text{h operasi}}=e
+\label{eq:order_elemen}
+\end{equation}
+
+Definisi ini terlalu luas untuk digunakan pada permasalahan logaritma diskret. Untuk itu, definisi tersebut bisa dipersempit: Order sebuah elemen $ a $ adalah suatu nilai $ h $ positif terkecil dimana apabila $ a $ dipangkatkan dengan $ h $ akan menghasilkan $ 1\ (mod\ n) $. Secara formal, penjelasan ini dapat ditulis menjadi persamaan \eqref{eq:order_modular_elemen}.
+\begin{equation}
+a^h\equiv 1\ (mod\ n)
+\label{eq:order_modular_elemen}
+\end{equation}
+
+Apabila sebuah elemen $ a $ memiliki order senilai $ \phi(n) $, elemen tersebut dinamakan \textit{primitive root modulo n}.
+Perhatikan bahwa persamaan \eqref{eq:order_modular_elemen} mirip dengan persamaan \eqref{eq:teorema_euler}. Kedua persamaan tersebut mengimplikasikan bahwa $ h\ |\ \phi(n) $ atau $ \phi(n) $ merupakan kelipatan $ h $, untuk $ h\leq \phi(n) $. Pembuktian klaim tersebut dapat dilihat pada penjabaran persamaan \eqref{eq:proof_order_modular_elemen_begin} sampai \eqref{eq:proof_order_modular_elemen}.
+
+Pertama asumsikan sebuah nilai $ g $ yang memiliki order sebesar $ h $ pada \textit{group} $ \mathbb{Z}_n $, dan sebuah \textit{primitive root} $ a $.
+\begin{align}
+\label{eq:proof_order_modular_elemen_begin}
+a^{\phi(n)} &\equiv 1\ (mod\ n)	\\
+a^{\phi(n)} &\equiv g^h\ (mod\ n) \\
+\phi(n) &\equiv (\log_a g) * h\ (mod\ \phi(n)) \\
+0 &\equiv (\log_a {a^x}) * h\ (mod\ \phi(n)) \\
+0 &\equiv x * h\ (mod\ \phi(n))
+\label{eq:proof_order_modular_elemen}
+\end{align}
+
+Pada subbab \ref{sec:Teorema Euler} telah dijelaskan mengenai himpunan $ H_a $ (perhatikan kembali persamaan \eqref{eq:himpunan_Ha}) dan bagaimana himpunan $ H_a $ tidak selalu sama dengan himpunan $ Z_n^* $. Hal ini berhubungan dengan sifat order $ h $, yaitu $ h\ |\ \phi(n) $. Sifat ini dapat ditulis menjadi persamaan \eqref{eq:sifat_himpunan_Ha}.
+\begin{equation}
+\phi(n)=q*h,\text{untuk q tertentu}
+\label{eq:sifat_himpunan_Ha}
+\end{equation}
+Kemudian dengan memasukkan \textit{primitive root} ke persamaan \eqref{eq:sifat_himpunan_Ha}, didapat persamaan \eqref{eq:proof_kesamaan_euler_phi_omega}.
+\begin{align}
+a^{\phi(n)} &=a^{qh} \\
+a^{\phi(n)} &=(a^q)^h \\
+a^{\phi(n)} &=\omega^h
+\label{eq:proof_kesamaan_euler_phi_omega}
+\end{align}
+Maka dari penjabaran di atas, sebuah elemen $ a $ yang memiliki order $ h $ (yaitu $\omega$) sebenarnya adalah sebuah \textit{primitive root} yang telah dipangkatkan dengan suatu nilai $ q $.\hfill\eop
+
+Himpunan $ H_{\omega} $ adalah semua nilai yang dapat dibentuk oleh $ a^{qi} $ untuk $ 0\leq i < \frac{\phi(n)}{q} $. Artinya, anggota $ H_{\omega} $ hanyalah nilai yang dapat dibentuk oleh pangkat kelipatan $ q $. Nilai lain bukan merupakan anggota himpunan $ H_a $. Secara formal penjelasan ini dapat ditulis menjadi persamaan \eqref{eq:himpunan_Hw}.
+\begin{equation}
+H_{\omega}=\left\{\omega^i\ (mod\ n)\ |\ 0 \leq i \leq \frac{\phi(n)}{q}\right\}
+\label{eq:himpunan_Hw}
+\end{equation}
+dimana $ \omega=a^q $ untuk $ a $ sebuah \textit{primitive root modulo n}.
+
+Dari pemaparan di atas, hubungan himpunan $ \mathbb{Z}_n^* $, $ H_a $ dimana $ a $ sebuah \textit{primitive root}, dan $ H_{\omega} $ dimana $ \omega $ sebuah elemen dengan order $ h $ dapat dilihat pada relasi \eqref{eq:relasi_zn_ha_hw}.
+\begin{equation}
+Z_n^*\supseteq H_a\supseteq H_{\omega}
+\label{eq:relasi_zn_ha_hw}
+\end{equation}
+
+$ H_a $ akan sama dengan $ Z_n^* $ apabila $ a $ merupakan \textit{primitive root}. $ H_{\omega} $ akan sama dengan $ H_a $ apabila order $ {\omega} $ adalah $ \phi(n) $.
+
+\subsection{Strategi Penyelesaian Naif Untuk Logaritma Diskret}
+Pencarian nilai $ x $ pada persamaan \eqref{eq:persamaan_umum_log_diskret} bisa dilakukan dengan mencoba semua nilai $ x = 0 $ hingga $ n-1 $. Hitung setiap nilai $ g^x\ (mod\ n) $ dan bandingkan dengan $ y $. Apabila keduanya bernilai sama, maka nilai $ x $ tersebut merupakan nilai logaritma diskret dari $ y $. Gambar \ref{psdo:disc_log_naive} menggambarkan prosedur yang dijelaskan.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+NAIVE-DISCRETE-LOGARITHM (g, y, n)
+result = 1
+for i = 0 to n-1
+if result == y
+return i
+result = (result * g) mod n
+return "NOT FOUND"
+\end{lstlisting}
+\caption{Pseudocode Pencarian Logaritma Diskret Secara Naif}
+\label{psdo:disc_log_naive}
+\end{figure}
+Strategi ini memiliki kompleksitas sebesar $ O(n) $.
+
+Metode ini tidak begitu baik apabila $ n $ bernilai besar. Untuk itu, domain $ i $ dapat diperkecil. Karena $ g $ memiliki order sebesar $ q $, maka \textit{brute force} dilakukan dengan memangkatkan $ g $ dengan $ i $ dimana $ 0\leq i < ord(g) $ atau $ 0 \leq i < q $ karena semua nilai yang mungkin dibentuk oleh pemangkatan dengan basis $ g $ berada pada rentang tersebut. Pengecilan domain $ i $ menyebabkan kompleksitas metode ini turun menjadi $ O(q) $. Walau telah dilakukan peningkatan, metode ini masih membutuhkan waktu yang relatif besar. Untuk itu alternatif strategi lain akan diajukan pada subbab berikutnya.
+
+\subsection {Strategi Penyelesaian Logaritma Diskret dengan Baby-step Giant-step}
+Penyelesaian ini memanfaatkan metode \textit{Baby-step Giant-step} dimana metode ini bertujuan memperkecil daerah pencarian hingga $ \sqrt{n} $ dimana $ n $ merupakan order sebuah elemen $ g $. Gambar \ref{fig:bsgs} memaparkan cara kerja metode ini.
+
+\begin{figure}
+	\Centering
+	\includegraphics[scale=0.44]{bab2/img/bsgs}
+	\caption{Diagram Alur Metode Penyelesaian Logaritma Diskret dengan \textit{Baby-step Giant-Step}}
+	\label{fig:bsgs}
+\end{figure}
+
+Kompleksitas strategi ini bergantung pada metode pencarian di percabangan kedua ("\textit{pair with key = q found}"). Umumnya metode ini menggunakan metode pencarian \textit{binary search}. Konsekuensinya, penyimpanan pasangan \textit{(p, i * limit)} dilakukan secara terurut dan seluruh proses ini membutuhkan waktu $ O(\sqrt{n}\ log\ n) $. Kemudian dengan menggunakan \textit{binary search} pencarian dapat dilakukan dengan kompleksitas $ O(log\ n) $. Selain \textit{binary search}, dapat juga digunakan \textit{hash table} sebagai alternatif dimana pencarian dapat dilakukan selama $ O(1) $. Penggunaan salah satu dari kedua metode pencarian tersebut mengakibatkan kompleksitas metode \textit{Baby-step Giant-step} secara keseluruhan menjadi $ O(\sqrt{n}) $.
+
+\subsection {Penjelasan Strategi Penyelesaian Logaritma Diskret dengan Baby-step Giant-step}
+
+Persamaan \eqref{eq:persamaan_umum_pembagian} mendasari metode \textit{Baby-step Giant-step}, yaitu pembagian dua bilangan. Diberikan sebuah bilangan $ a $, apabila dibagi dengan sebuah bilangan tertentu $ x $, akan membentuk persamaan \eqref{eq:persamaan_dasar_bsgs}
+\begin{equation}
+a=qx+r
+\label{eq:persamaan_dasar_bsgs}
+\end{equation}
+
+Pada persamaan \eqref{eq:persamaan_dasar_bsgs}, $ q $ berada pada rentang $ 0 \leq q \leq a $ dan $ r $ berada pada rentang 
+$ 0 \leq r < x $. Umpamakan proses pencarian $ q $ dan $ r $ tidak dapat dilakukan dengan operasi pembagian dan mod. Pencarian nilai $ q $ dan $ r $ maka harus menggunakan pendekatan \textit{brute force}, yaitu mencoba semua kombinasi $ q $ dan $ r $ yang menyebabkan persamaan \eqref{eq:persamaan_dasar_bsgs} bernilai benar. Mengingat nilai $ q $ dan $ r $ bergantung pada nilai $ x $ yang digunakan, maka perlu dipilih sebuah nilai $ x $ yang menyebabkan daerah pencarian $ q $ dan $ r $ minimal. Variabel pada persamaan \eqref{eq:persamaan_dasar_bsgs} yaitu $ q $, $ x $, dan $ r $ memiliki hubungan satu sama lainnya. Hubungan ini dapat dilihat pada proporsi \eqref{eq:proporsi_var_persamaan_dasar_bsgs}.
+\begin{equation}
+\frac{1}{q} \propto x \propto r
+\label{eq:proporsi_var_persamaan_dasar_bsgs}
+\end{equation}
+
+Variabel $ q $ dan $ x $ memiliki proporsi saling terbalik, yaitu apabila nilai $ q $ naik, nilai $ x $ akan turun. Kasus sebaliknya juga berlaku. Sedangkan variabel $ x $ dan $ r $ memiliki proporsi langsung, yaitu apabila nilai $ x $ naik, nilai $ r $ akan naik juga. Kasus sebaliknya juga berlaku. Untuk menghasilkan kombinasi $ q $ dan $ r $ yang minimal, nilai $ x $ harus dipilih supaya $ q $ dan $ r $ kurang lebih bernilai sama. Nilai $ x $ yang dapat digunakan adalah $ \sqrt{a} $, dimana $ q=\sqrt{a} $, dan $ x=r=\sqrt{a} $. Untuk menjamin $ \sqrt{a} \in \mathbb{Z}_n $, hasil $ \sqrt{a} $ dibulatkan ke atas. Persamaan \eqref{eq:persamaan_dasar_bsgs} kini dapat ditulis menjadi persamaan \eqref{eq:bsgs_dengan_akar_A}.
+\begin{equation}
+a=q\sqrt{a}+r
+\label{eq:bsgs_dengan_akar_A}
+\end{equation}
+Sekarang, andaikata nilai $ a $ pada persamaan di atas merupakan nilai $ a $ yang sama pada persamaan $ g^a \equiv y\ (mod\ p) $, persamaan di atas dapat diubah menjadi
+\begin{align}
+log_{g}\ y &= q\sqrt{a}+r \\
+y &\equiv g^{q\sqrt{a}+r}\ (mod\ p) \\
+y*g^{-r} &\equiv g^{q\sqrt{a}}\ (mod\ p)
+\label{eq:bsgs_persamaan_utama_dengan_invers_r}
+\end{align}
+Maka apabila ditemukan nilai $ r $ dan $ q $ tertentu yang memenuhi bentuk persamaan \eqref{eq:bsgs_persamaan_utama}, logaritma diskret $ y $ dapat dihitung dengan menghitung $ q\sqrt{a}+r $. Sayangnya proses penghitungan $ q\sqrt{a}+r $ membutuhkan pencarian invers modulus $ g^r $, sebuah proses yang membutuhkan waktu komputasi yang cukup mahal. Hal ini dapat dihindari dengan sedikit mengubah persamaan \eqref{eq:bsgs_persamaan_utama}.
+\begin{equation}
+a=q\sqrt{a}-r
+\label{eq:bsgs_dengan_invers_r}
+\end{equation}
+Dengan mengikuti proses transformasi persamaan \eqref{eq:bsgs_dengan_akar_A} menjadi persamaan \eqref{eq:bsgs_persamaan_utama_dengan_invers_r}, persamaan \eqref{eq:bsgs_dengan_invers_r} dapat diubah menjadi persamaan \eqref{eq:bsgs_persamaan_utama}.
+\begin{align}
+log_{g}\ y &= q\sqrt{a} - r \\
+y &\equiv g^{q\sqrt{a} - r}\ (mod\ p) \\
+y*g^r &\equiv g^{q\sqrt{a}}\ (mod\ p)
+\label{eq:bsgs_persamaan_utama}
+\end{align}
+Dengan menggunakan persamaan \eqref{eq:bsgs_persamaan_utama}, logaritma diskret $ y $ dapat dicari tanpa harus mencari invers modulus $ g^r $. Yang perlu dilakukan sekarang adalah mencari pasangan $ r $ dan $ q $ yang memenuhi persamaaan \eqref{eq:bsgs_persamaan_utama}. Disinilah alasan metode ini disebut \textit{Baby-step Giant-step}. Pada sisi kiri persamaan \eqref{eq:bsgs_persamaan_utama}, nilai $ y*g^r $ dicari. Bagian ini merupakan \textit{baby-step} karena interval pangkat untuk basis $ g $ yang digunakan adalah $ 1 $ (nilai pangkat yang digunakan adalah $ \{0,1,2,\ldots,\allowbreak\sqrt{a}-1\} $). Bagian sisi kanan persamaan \eqref{eq:bsgs_persamaan_utama} disebut \textit{giant-step} karena untuk mencari nilai $ g^{q\sqrt{a}} $, interval pangkat untuk basis $ g $ yang digunakan adalah $ \sqrt{a} $ (nilai pangkat yang digunakan adalah $ \{0,\sqrt{a},2\sqrt{a},\ldots,(\sqrt{a}-1) \sqrt{a}\} $).
+Persamaan \eqref{eq:bsgs_persamaan_utama_dengan_invers_r} dan persamaan \eqref{eq:bsgs_persamaan_utama} menyebabkan daerah pencarian $ r $ dan $ q $ turun menjadi $ O(\sqrt{a}) $.
+
+\subsection{Strategi Penyelesaian Logaritma Diskret dengan Pollard Rho}
+Metode \textit{Pollard Rho} awalnya adalah metode untuk melakukan faktorisasi bilangan. Namun metode ini dapat dimodifikasi agar dapat digunakan untuk melakukan pencarian logaritma diskret.
+Diberikan sebuah \textit{random function} $ f_n (x) $.
+\begin{subequations}
+	\[
+		f_n (x)=
+		\begin{cases}
+		(\beta*x)\ mod\ n, &\text{if } x\in S_1 \\
+		(x*x)\ mod\ n, &\text{if } x\in S_2 \\
+		(\alpha*x)\ mod\ n, &\text{if } x\in S_3
+		\end{cases}
+		\tag{\ref{eq:random_function}}
+	\]
+	\label{eq:random_function}
+\end{subequations}
+Terdapat tiga himpunan, $ S_1 $, $ S_2 $, dan $ S_3 $, masing-masing merupakan himpunan bagian $ \mathbb{Z} $, yang digunakan untuk menentukan persamaan $ f_n (x) $ yang digunakan. Tidak ada batasan yang terlalu mengikat dalam menentukan anggota ketiga himpunan ini selain ketiga himpunan ini harus memiliki kardinalitas yang kurang lebih sama, dan $ 1 \notin S_2 $.
+
+Fungsi $ f_n (x) $ akan digunakan untuk proses \textit{step}. Proses ini dapat dijabarkan sebagai berikut.
+\begin{enumerate}
+\item Tentukan nilai $ f_n (x_0)=1 $
+\item Cari nilai $ x_{i+1}=f_n (x_i) $
+\end{enumerate}
+
+Fungsi $ f_n (x) $ akan bekerja pada sistem modulus n (yaitu $ \mathbb{Z}_n^* $). Apabila proses \textit{step} dilakukan terus menerus, suatu saat akan ada nilai $ f_n (x_s) $ yang bernilai sama dengan $ f_n (x_t) $, $ s>t $. Hal ini disebabkan $ f_n (x) \in \mathbb{Z}_n $ , dan himpunan $ \mathbb{Z}_n $ memiliki jumlah anggota berhingga. Suatu saat keluaran fungsi $ f_n (x) $ telah merentang seluruh nilai $ \mathbb{Z}_n $ yang mungkin dibentuk, sehingga \textit{step-step} selanjutnya hanya mengulang permutasi nilai yang dihasilkan oleh $ f_n (x) $.\cite{brent_montecarlo}
+
+Dengan diketahui dua nilai $ f_n (x_s) $ dan $ f_n (x_t) $, nilai logaritma diskret $ y $ dapat diketahui. Untuk itu, fungsi $ f_n (x) $ untuk suatu $ x $ perlu ditulis dengan persamaan \eqref{eq:persamaan_umum_step}.
+\begin{equation}
+f_n (x)\equiv \alpha^a \beta^b\ (mod\ n)
+\label{eq:persamaan_umum_step}
+\end{equation}
+
+Kemudian jabarkan persamaan $ f_n (x_s)=f_n (x_t) $, $ s>t $ dalam bentuk persamaan \eqref{eq:persamaan_umum_step}.
+\begin{align}
+f_n (x_s) &\equiv f_n (x_t)\ (mod\ n) \\
+\alpha^{a_s} * \beta^{b_s} &\equiv \alpha^{a_t} * \beta^{b_t}\ (mod\ n) \\
+\alpha^{a_s-a_t} &\equiv \beta^{b_t-b_s}\ (mod\ n) \\
+a_s - a_t &\equiv log_{\alpha} \beta * (b_t - b_s)\ (mod\ n)
+\label{eq:persamaan_umum_step_logaritmik}
+\end{align}
+Dengan memasukkan nilai $ \alpha=g $ dan $ \beta=y $, persamaan \eqref{eq:persamaan_umum_step_logaritmik} memberikan nilai logaritma diskret $ y $.
+
+Untuk menggunakan metode ini, dibutuhkan sebuah cara untuk mencari $ f_n (x_s) $ dan $ f_n (x_t) $ secara efisien. Subbab selanjutnya akan menjelaskan cara untuk menemukan $ f_n (x_s) $ dan $ f_n (x_t) $.
+
+\subsection{Brent Cycle Detection}
+Cara ini menggunakan dua buah \textit{pointer}, $ p_1 $ dan $ p_2 $. Setiap proses \textit{step}, $ p_1 $ melakukan 1 \textit{step}. Pointer $ p_2 $ bergerak setiap iterasi step ke $ 2^i $ dengan menyamakan posisinya dengan $ p_1 $. Gambar \ref{fig:brent_pollard_rho} menjabarkan metode ini secara detail.
+\begin{figure}[h!]
+	\Centering
+	\includegraphics[scale=0.4,angle=90]{bab2/img/pollard-rho-brent}
+	\caption {Diagram Alur Metode Deteksi Siklus Brent}
+	\label{fig:brent_pollard_rho}
+\end{figure}
+
+Cara ini bisa gagal apabila selisih indeks pangkat $ \beta $ bernilai $ 0\ (mod\ n) $. Apabila hal tersebut terjadi, ulangi pencarian nilai $ p_1 = p_2 $ dari awal, namun kedua \textit{pointer} dimulai dari $ f(x)=\alpha^i \beta^j\ (mod\ n) $, dimana $ 0 \leq i < n $ dan $ 0 \leq j < n $. \textit{Brent Cycle Detection} memiliki kompleksitas sebesar $ O(\sqrt{n}) $.
+
+\section{Strategi Perkalian Modular}
+
+Perkalian modular adalah persamaan \eqref{eq:persamaan_umum_perkalian_modular}.
+\begin{equation}
+a*b=c\ (mod\ n)
+\label{eq:persamaan_umum_perkalian_modular}
+\end{equation}
+
+Sebelumnya telah dijelaskan bahwa terdapat kemungkinan terjadinya \textit{integer overflow} karena besarnya nilai $ p $. Maka perlu digunakan sebuah metode perkalian yang dapat menghindari kasus \textit{integer overflow}. Mengingat proses perkalian merupakan proses yang sering terjadi, metode tersebut juga sebaiknya memiliki kecepatan yang tinggi. Pada subbab ini akan dijabarkan dua metode perkalian yang dapat digunakan.
+
+\subsection{Strategi Naif Perkalian Modular}
+
+Strategi naif ini sebenarnya adalah persamaan \eqref{eq:mod_kali} yang ditulis dalam bentuk persamaan \eqref{eq:mod_kali_long}. Hal ini berguna untuk menekan nilai $ a $ dan $ b $ yang tinggi. Setelah dilakukan perkalian, terdapat kemungkinan hasil perkalian melebihi nilai $ n $. Maka dari itu, hasil perkalian $ a $ dan $ b $ kembali dimodulus sekali lagi dengan $ n $. Gambar \ref{psdo:modmul_naive} memaparkan strategi yang dimaksud.
+
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0,captionpos=b]
+NAIVE-MODULAR-MULTIPLICATION (a, b, n)
+return ((a mod n) * (b mod n)) mod n
+\end{lstlisting}
+\caption{Pseudocode Metode Perkalian Modular Naif}
+\label{psdo:modmul_naive}
+\end{figure}
+
+Metode ini dapat digunakan untuk $ n \leq 2^{32} $ karena hasil terbesar yang mungkin didapat dari perkalian modular dimana $ n \leq 2^{32} $ adalah $ a*b = c \Longrightarrow ( 2^{32}-1 ) * ( 2^{32}-1 ) = 2^{64} - 2^{33} + 1 $. Nilai ini masih dapat ditampung menggunakan 64-bit integer.
+
+\subsection{Strategi Perkalian Modular dengan Logarithmic Modular Multiplication} 
+Metode \textit{Logarithmic Modular Multiplication} merupakan analog dari \textit{Modular Expontiation} \cite{geeks_modular_multiplication}. Yang membedakan adalah ketimbang pemangkatan, \textit{Logarithmic Modular Multiplication} melakukan perkalian. Gambar \ref{fig:log_mod_mul} menjelaskan langkah metode ini.
+
+\begin{figure}
+	\Centering
+	\includegraphics[angle=90,scale=0.5]{bab2/img/modular-multiplication}
+	\caption{Diagram Alur \textit{Logarithmic Modular Multiplication}}
+	\label{fig:log_mod_mul}
+\end{figure}
+
+Strategi ini memiliki kompleksitas $ O(log\ b) $.
+
+\subsection{Penjelasan Strategi Perkalian Modular dengan Logarithmic Modular Multiplication}
+
+Nilai $ b $ pertama-tama diubah menjadi sebuah polinomial \eqref{eq:dekomposisi_biner_perkalian}.
+\begin{equation}
+b=2^{0}*b_0+2^{1}*b_1+2^{2}*b_2+\ldots+2^{t}*b_t
+\label{eq:dekomposisi_biner_perkalian}
+\end{equation}
+Kemudian kalikan kedua sisi persamaan dengan $ a $.
+\begin{align}
+ab &= a2^{0}*b_0+a2^{1}*b_1+\ldots+a2^{t}*b_t \\
+ab &= \sum_{i=0}^{t} a2^{i}*b_i 
+\label{eq:generalisasi_dekomposisi_biner_perkalian}
+\end{align}
+Maka perhitungan perkalian $ a $ dengan $ b $ merupakan persamaan \ref{eq:generalisasi_dekomposisi_biner_perkalian}. Nilai $ a $ secara perlahan dikalikan dengan nilai $ 2^{i} $. Metode penghitungan persamaan \ref{eq:generalisasi_dekomposisi_biner_perkalian} sama dengan cara penghitungan persamaan \ref{eq:generalisasi_dekomposisi_biner_pemangkatan}. Apabila $ f(x)=a2^{x}*b_x $, maka $ f(x) $ dapat ditulis menjadi persamaan \eqref{eq:relasi_fx_a2x}.
+\begin{subequations}
+\[
+	f(x)=
+	\begin{cases}
+		0, 		& \text{if } b_x=0 \\
+		a2^x	& \text{if } b_x=1
+	\end{cases}
+	\tag{\ref{eq:relasi_fx_a2x}}
+\]
+\label{eq:relasi_fx_a2x}
+\end{subequations}
+
+Nilai $ 2^{x} $ dapat digunakan ulang untuk menghitung persamaan \eqref{eq:generalisasi_dekomposisi_biner_perkalian} karena banyak proses pemangkatan yang saling \textit{overlap}. Misalnya, pemangkatan $ 2^{7} $ pasti harus menghitung hasil pemangkatan $ 2^{4} $, sehingga untuk menghitung nilai $ 2^{7} $ dapat menggunakan hasil pemangkatan $ 2^{4} $. Maka nilai $ a_i=a2^{i} $ dapat ditulis sebagai relasi \eqref{eq:relasi_rekurens_a_i}.
+\begin{subequations}
+\[
+	a_i=
+	\begin{cases}
+		a, 			& \text{if } i = 0 \\
+		a_{i-1} * 2	& \text{if } i > 0
+	\end{cases}
+	\tag{\ref{eq:relasi_rekurens_a_i}}
+\]
+\label{eq:relasi_rekurens_a_i}
+\end{subequations}
+
+Untuk menghitung nilai $ a_i $, kalikan nilai $ a_{i-1} $ yang tersimpan dengan 2. Cara ini dapat digunakan hingga $ a\ (\log b) $ sehingga penghitungan $ f(n) $ akan membutuhkan $ O(\log b) $ proses perkalian dengan dua. Konsekuensinya, persamaan \eqref{eq:relasi_fx_a2x} membutuhkan $ O(\allowbreak\log b) $ proses perkalian. Metode ini dapat digunakan untuk perkalian hingga 63-bit.
+
+\section{Landasan Terkait Pengujian Kebenaran Program}
+Keluaran program yang akan digunakan untuk menyelesaikan permasalahan perlu diujikan kebenarannya. Untuk itu perlu dibuat masukan yang mengikuti penjelasan soal seperti yang telah diterangkan pada subbab \ref{sec:Parameter Masukan}. Beberapa teori dan landasan yang akan dimanfaatkan untuk membuat parameter masukan akan dijabarkan pada subbab ini.
+
+\subsection{Miller-Rabin Primality Test}
+
+Subbab ini menjelaskan sebuah metode untuk melakukan pengecekan keprimaan sebuah bilangan, yaitu \textit{Miller-Rabin Primality Test}. Metode ini akan digunakan untuk membangun beberapa parameter.
+
+Metode pengecekan keprimaan \textit{Miller-Rabin} digunakan sebagai alternatif metode pengecekan keprimaan secara naif (dimana metode tersebut memiliki kompleksitas $ O(\sqrt{n})) $. Metode ini menggunakan dasar bahwa apabila terdapat sebuah bilangan ganjil $ n $, kemudian dicari nilai $ r $ yang memenuhi persamaan $ n-1=2^{s} r $, dan apabila $ n $ merupakan bilangan prima, maka setidaknya salah satu dari kedua persamaan berikut akan bernilai benar. \cite{hac_publickey}
+\begin{align}
+\label{eq:miller_rabin_condition_1}
+a^r &\equiv 1\ (mod\ n), & \gcd(a,n)=1 \\
+\label{eq:miller_rabin_condition_2}
+a^{2^j r} &\equiv -1\ (mod\ n), & \gcd(a,n)=1,\ 0 \leq j <s-1
+\end{align}
+Persamaan \eqref{eq:miller_rabin_condition_1} dan \eqref{eq:miller_rabin_condition_2} memberi batasan tersirat bahwa untuk suatu nilai $ a $, $ a>0 $. Untuk seterusnya, nilai $ a $ akan diasumsikan jatuh pada rentang $ 1 \leq a < n $.
+
+Untuk $ n $ yang berupa bilangan prima, salah satu dari persamaan di atas pasti akan terpenuhi. Namun untuk $ n $ yang bukan merupakan bilangan prima, terdapat nilai $ a $ yang memenuhi kedua persamaan di atas. Bilangan $ a $ ini umum disebut dengan \textit{strong liar} terhadap keprimaan $ n $. Artinya, bilangan $ a $ seolah-olah menunjukkan bahwa nilai $ n $ merupakan bilangan prima sebab nilai $ a $ tersebut memenuhi persamaan \eqref{eq:miller_rabin_condition_1} atau \eqref{eq:miller_rabin_condition_2}. Kehadiran \textit{strong liar} untuk $ n $ paling banyak berjumlah $ \frac{1}{4} \phi(n) $ dimana $ \phi(n) $ merupakan \textit{Euler Totient Function}. Artinya kemungkinan nilai komposit $ n $ dianggap sebagai bilangan prima paling besar adalah $ 25\% $.
+
+Kemungkinan terjadinya galat pada metode \textit{Miller-Rabin} dapat diperkecil dengan beberapa kali mengecek nilai $ a $ yang berbeda-beda. Untuk $ t $ kali percobaan, kemungkinan terjadinya galat pada metode \textit{Miller-Rabin} adalah paling banyak $ (\frac{1}{4})^{t} $. Semakin besar nilai $ t $, semakin kecil kemungkinan terjadinya galat.
+
+\textit{Miller-Rabin} awalnya adalah metode probabilistik untuk menentukan keprimaan sebuah bilangan. Namun dengan membatasi nilai yang akan diperiksa jatuh pada rentang $ 2 \leq n < 2^{64} $, metode \textit{Miller-Rabin} berubah menjadi metode deterministik. Online Encyclopedia of Integer Sequence \cite{oeis_mrabin_limit} menjabarkan sederet nilai yang merupakan nilai batas atas pengujian Miller-Rabin yang tidak akan menghasilkan keluaran yang salah jika diujikan dengan himpunan nilai $ a $ tertentu. Himpunan ini merupakan $ i $ bilangan prima pertama dimana $ i $ adalah suku ke-i pada deretan nilai batas atas. Tabel \ref{tab:miller_rabin_deterministic_a} berisi himpunan yang dimaksud.
+
+\begin{table}[h!]
+	\caption{Himpunan Bilangan Pengecek Keprimaan Miller Rabin Jika N Kurang Dari Batas Atas}
+	\label{tab:miller_rabin_deterministic_a}
+	\ttfamily
+	\begin{tabularx}{\linewidth}{ |l|l|X| }
+		\hline
+		i&	Batas Atas&	\{a\} \\
+		\hline
+		1&	2047&	2 \\
+		2&	1373653&	2, 3 \\
+		3&	25326001&	2, 3, 5 \\
+		4&	3215031751&	2, 3, 5, 7 \\
+		5&	2152302898747&	2, 3, 5, 7, 11 \\
+		6&	3474749660383&	2, 3, 5, 7, 11, 13 \\
+		7&	341550071728321&	2, 3, 5, 7, 11, 13, 17 \\
+		8&	341550071728321&	2, 3, 5, 7, 11, 13, 17, 19 \\
+		9&	3825123056546413051&	2, 3, 5, 7, 11, 13, 17, 19, 23 \\
+		10&	3825123056546413051&	2, 3, 5, 7, 11, 13, 17, 19, 23, 29 \\
+		11&	3825123056546413051&	2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 \\
+		12&	318665857834031151167461&	2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37 \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+\subsection{Polinomial Pembuat Bilangan Prima}
+
+Pencarian bilangan prima dapat dilakukan dengan mencoba nilai satu per satu dan mengecek apakah nilai tersebut merupakan bilangan prima atau bukan. Cara ini cenderung tidak efektif. Untuk mempersingkat waktu pencarian bilangan prima, digunakan sebuah polinomial penghasil prima.
+
+Polinomial pembuat bilangan prima yang digunakan adalah polinomial \eqref{eq:polinomial_pembuat_prima}. \cite{wolfram_prime_polynomial}
+\begin{equation}
+f(n)=n^2+n+41
+\label{eq:polinomial_pembuat_prima}
+\end{equation}
+
+Walaupun polinomial \eqref{eq:polinomial_pembuat_prima} disebut dengan polinomial penghasil prima, keluaran polinomial ini belum tentu selalu bilangan prima sehingga perlu dilakukan pengecekan keprimaan. Kendati begitu, penggunaan polinomial ini mampu mempercepat pencarian bilangan prima dibandingkan metode naif.

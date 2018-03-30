@@ -1,0 +1,702 @@
+\chapter {IMPLEMENTASI}
+
+\section{Lingkungan implementasi}
+
+Lingkungan implementasi dan pengembangan yang dilakukan adalah sebagai berikut.
+\begin{enumerate}
+	\item Perangkat Keras
+	\begin{enumerate}
+		\item Processor Intel® Core™ i5-7400 CPU @ 3.00GHz (4 CPUs), ~3.0GHz
+		\item Random Access Memory 8192MB
+	\end{enumerate}
+	\item Perangkat Lunak
+	\begin{enumerate}
+		\item Sistem Operasi Windows 10 Pro 64-bit
+		\item IDE CodeBlocks 17.12
+		\item Bahasa Pemrograman C++
+		\item MinGW 64-bit
+	\end{enumerate}
+\end{enumerate}
+
+\section{Implementasi Program Utama}
+
+Subbab ini menjelaskan implementasi program utama. Program ini merupakan program yang digunakan untuk menyelesaikan permasalahan DSA Attack.
+
+\subsection{Penggunaan Library, Tipe data, dan Struct}
+
+Program ini menggunakan beberapa \textit{library} dan tipe data seperti yang ditunjukkan pada kode sumber \ref{code:header_main}.
+
+\begin{code}[firstnumber=1,float]{\textit{Header} Program Utama}{header_main}
+#include <cstdio>
+#include <cstdlib>
+#include <unordered_map>
+#include <utility>
+#include <cmath>
+#include <vector>
+
+typedef unsigned long long uint64;
+typedef          long long int64;
+\end{code}
+
+Untuk mengakomodasi aritmatika modular, sebuah \textit{struct} dengan tujuan tersebut diimplementasikan. Kode sumber \ref{code:zelement_1} sampai \ref{code:zelement_5} menjelaskan implementasi \textit{struct} yang dimaksud.
+
+\newpage
+
+\begin{code}[firstnumber=0]{\protect\textit{Struct} ZElement (bg. 1)}{zelement_1}
+ZElement
+uint64 character;
+uint64 element;
+uint64 order;
+
+ZElement (uint64 character, uint64 element, uint64 order = 0)
+{
+	this->character = character;
+	this->element = element % character;
+	this->order = (order == 0) ? character - 1 : order; // Assumes the element is primitive element
+}
+
+ZElement (const ZElement & other)
+{
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{\textit{Struct} ZElement (bg. 2)}{zelement_2}
+	this->character = other.character;
+	this->element = other.element;
+	this->order = other.order;
+}
+
+ZElement ()
+{   character = 0; element = 0; order = 0; }
+
+ZElement & operator = (const uint64 & other)
+{
+	this->element = other % character;
+	return *this;
+}
+
+ZElement operator + (const uint64 & other)
+{
+	uint64 output = (element + (other % character)) % character;
+	return ZElement (character, output);
+}
+
+// TODO: may fail when other >= 2 * character
+ZElement operator - (const uint64 & other)
+{
+	uint64 output = (element >= other) ?
+	element - other :
+	element - other + character;
+	return ZElement (character, output);
+}
+
+ZElement operator * (const uint64 & other)
+{
+	return ZElement (character, modularMultiplication (element, other, character));
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{\textit{Struct} ZElement (bg. 3)}{zelement_3}
+}
+
+ZElement operator + (const ZElement & other)
+{
+	return *this + other.element;
+}
+
+ZElement operator - (const ZElement & other)
+{
+	return *this - other.element;
+}
+
+ZElement operator * (const ZElement & other)
+{
+	return *this * other.element;
+}
+
+ZElement & operator += (const uint64 & other)
+{
+	this->element = (element + (other % character)) % character;
+	return *this;
+}
+
+// TODO: may fail when other >= 2 * character
+ZElement & operator -= (const uint64 & other)
+{
+	this->element = (element >= other) ?
+	element - other :
+	element - other + character;
+	return *this;
+}
+
+ZElement & operator *= (const uint64 & other)
+{
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{\textit{Struct} ZElement (bg. 4)}{zelement_4}
+	ZElement result = ZElement (character, modularMultiplication (element, other, character));
+	this->element = result.element;
+	return *this;
+}
+
+ZElement & operator += (const ZElement & other)
+{
+	*this += other.element;
+	return *this;
+}
+
+// TODO: may fail when other >= 2 * character
+ZElement & operator -= (const ZElement & other)
+{
+	*this -= other.element;
+	return *this;
+}
+
+ZElement & operator *= (const ZElement & other)
+{
+	*this *= other.element;
+	return *this;
+}
+
+bool operator < (const ZElement & other) const
+{
+	return element < other.element;
+}
+
+bool operator == (const ZElement & other) const
+{
+	return element == other.element;
+}
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{\textit{Struct} ZElement (bg. 5)}{zelement_5}
+	
+bool operator != (const ZElement & other) const
+{
+	return element != other.element;
+}
+
+ZElement invert ()
+{
+	return ZElement (character, modularInverse (element, character));
+}
+\end{code}
+
+\subsection{Implementasi Fungsi Main}
+
+Subbab ini menjabarkan implementasi fungsi \textit{main} yang dijelaskan pada subbab~\ref{sec:Desain Fungsi Main}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:main}.
+
+\begin{code}[firstnumber=0]{Fungsi Main}{main}
+int main()
+uint64  N, // Number of bit for q
+L, // Number of bit for p
+q, // Global basis
+p, // Public key modulus
+g, // Generator
+y, // Public key query i.e. moduled generator
+M; // Hashed message
+
+scanf ("%llu%llu%llu%llu%llu%llu%llu", &N, &L, &q, &p, &g, &y, &M);
+uint64 index = BSGS (g, p, y, q);
+
+auto signedPair = sign (M, q, g, p, index);
+
+printf ("%llu %llu\n", signedPair.first.element, signedPair.second.element);
+\end{code}
+
+\subsection{Implementasi Fungsi Baby-step Giant-step}
+
+Subbab ini menjabarkan implementasi fungsi \textit{Baby-step Giant-step} yang dijelaskan pada subbab \ref{sec:Desain Fungsi Baby-step Giant-step}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:bsgs_1} sampai \ref{code:bsgs_2}.
+
+\begin{code}[firstnumber=0]{Fungsi \textit{Baby-step Giant-step} (bg. 1)}{bsgs_1}
+uint64 BSGS (const uint64 & generator, const uint64 & modulo, const uint64 & query, const uint64 & order)
+typedef ZElement key_t;   // Will contain g^(limit * i) mod p
+typedef ZElement value_t; // Will contain limit * i mod q
+
+std::unordered_map <key_t, value_t, ZElement_hash> giantStep;
+
+uint64 limit = std::ceil (std::pow (order, 0.5));
+
+ZElement giantStepSize = modularExponentiation (ZElement (modulo, generator, order), limit);
+key_t   currentGiantStepKey (modulo, 1);
+value_t currentGiantStepValue (order, 0);
+
+for (uint64 i = 0; i <= limit; i++)
+{
+	giantStep[ currentGiantStepKey ] = currentGiantStepValue;
+	currentGiantStepKey *= giantStepSize;
+	currentGiantStepValue += limit;
+}
+
+key_t poweredResult (modulo, query);
+for (uint64 i = 0; i < limit; i++)
+{
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{Fungsi \textit{Baby-step Giant-step} (bg. 2)}{bsgs_2}
+	auto it = giantStep.find ( poweredResult );
+	if (it != giantStep.end())
+	return (it->second - i).element;
+	poweredResult *= generator;
+}
+
+return -1;
+\end{code}
+
+Fungsi ini menggunakan \textit{library} \texttt{unordered\textunderscore map}. Untuk itu, dibutuhkan sebuah fungsi untuk menghasilkan \textit{hash value} dari tipe data \texttt{ZElement}. Fungsi tersebut dapat dilihat pada kode sumber \ref{code:zelement_hash}.
+
+\begin{code}[firstnumber=0]{Penghitung Nilai \textit{Hash} Tipe Data ZElement}{zelement_hash}
+struct ZElement_hash
+size_t operator () (const ZElement & in) const
+{
+	return  std::hash <uint64> () (in.character) ^
+	std::hash <uint64> () (in.element) ^
+	std::hash <uint64> () (in.order);
+}
+\end{code}
+
+\subsection{Implementasi Fungsi Pollard Rho}
+
+Subbab ini akan menjelaskan bagaimana desain fungsi \textit{Pollard Rho} akan diimplementasikan. Fungsi ini merupakan sebuah modul yang komponennya sangat berkaitan. Untuk itu, segala hal yang berkaitan dengan \textit{Pollard Rho} dikumpulkan dalam sebuah \textit{struct} pada kode sumber \ref{code:general_pollard_rho}.
+
+\begin{code}[firstnumber=0, float=h!]{Struktur \textit{Struct Pollard Rho}}{general_pollard_rho}
+struct pollardRho
+/// variable
+// ...
+// ...
+
+/// static functions
+// ...
+// ...
+\end{code}
+
+\subsubsection{Penggunaan Struct Step}
+
+Sebuah \textit{struct} untuk akan digunakan untuk melakukan proses \textit{step}. Selain itu, \textit{struct} ini juga berfungsi untuk menyimpan histori \textit{step} setiap \textit{pointer}. \textit{Struct} ini merupakan implementasi desain pada subbab \ref{sec:Desain Fungsi Step Untuk Pollard Rho}. Implementasi \textit{struct} ini dapat dilihat pada kode sumber \ref{code:step_1} dan \ref{code:step_2}.
+
+\begin{code}[firstnumber=0, float]{Struct \textit{Step} (bg. 1)}{step_1}
+struct step
+ZElement value;
+ZElement alpha;
+ZElement beta;
+
+step (ZElement value, ZElement alpha, ZElement beta)
+{
+	this->value = value;
+	this->alpha = alpha;
+	this->beta = beta;
+}
+
+step ()
+{
+	this->value = ZElement (1, 0);
+	this->alpha = ZElement (1, 0);
+	this->beta = ZElement (1, 0);
+}
+
+void stepPartitionOne (const uint64 & betaValue)
+{
+	beta += 1;
+	value *= betaValue;
+}
+
+void stepPartitionTwo ()
+{
+	alpha += alpha;
+	beta += beta;
+	value *= value;
+}
+\end{code}
+\begin{code}[firstnumber=last, float=h]{Struct \textit{Step} (bg. 2)}{step_2}
+void stepPartitionThree (const uint64 & alphaValue)
+{
+	alpha += 1;
+	value *= alphaValue;
+}
+
+/**
+*  Defines the step function
+*  S1 consists of residue class [1]
+*  S2 consists of residue class [0]
+*  S3 consists of residue class [2]
+*/
+step & goForward (const uint64 & A, const uint64 & B)
+{
+	int residue = value.element & 3;
+	if      (residue == 1) stepPartitionOne(B);
+	else if (residue == 0) stepPartitionTwo();
+	else                   stepPartitionThree(A);
+	
+	return *this;
+}
+\end{code}
+
+\textit{Struct} ini memiliki tiga variabel yang penting dalam melakukan proses \textit{step}. Nilai ini tertera pada tabel \ref{tab:var_step}. Nilai A dan B akan ditentukan mengikuti penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Pollard Rho}.
+
+\begin{table}[h!]
+\caption{Variabel Struct Step}
+\label{tab:var_step}
+\begin{tabularx}{\linewidth}{ |c|c|X| }
+\hline
+No	&Nama	&Deskripsi \\
+\hline
+1	&\textit{value}	&Menyimpan nilai $ v=A^{\alpha} B^{\beta}\ (mod\ m) $ \\
+2	&\textit{alpha}	&Menyimpan berapa kali step ini telah dikalikan dengan A \\
+3	&\textit{beta}	&Menyimpan berapa kali step ini telah dikalikan dengan B \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Implementasi Fungsi Pollard Rho dengan Brent Cycle Detection}
+
+Subbab ini menjabarkan implementasi fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection} yang dijelaskan pada subbab \ref{sec:Desain Fungsi Pollard Rho dengan Brent Cycle Detection}. Implementasi fungsi ini dapat dapat dilihat pada kode sumber \ref{code:brent_1} dan \ref{code:brent_2}.
+\begin{code}[firstnumber=0]{Fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection} (bg. 1)}{brent_1}
+static uint64 brent (const uint64 & generator, const uint64 & modulo, const uint64 & query, const uint64 & order)
+uint64 nextCheckpoint = 1;
+uint64 currentIteration = 0;
+
+step lastCheckpointStep;
+step currentStep (ZElement (modulo, 1), ZElement (order, 0), ZElement (order, 0));
+\end{code}
+\begin{code}[firstnumber=last]{Fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection} (bg. 2)}{brent_2}
+ZElement betaDifference;
+
+bool done = false;
+
+while ( ! done )
+{
+	lastCheckpointStep = currentStep;
+	nextCheckpoint = nextCheckpoint * 2;
+	
+	for (; ( !done ) && currentIteration < nextCheckpoint; currentIteration++)
+	{
+		currentStep.goForward(generator, query);
+		if (currentStep.value == lastCheckpointStep.value)
+		{
+			betaDifference = lastCheckpointStep.beta - currentStep.beta;
+
+			if (betaDifference.element == 0)
+			{
+				currentStep = randomizeStartingStep (generator, order, modulo, query);
+			}
+			else
+			{
+				done = true;
+			}
+		}
+	}
+}
+
+ZElement result = betaDifference.invert();
+result *= (currentStep.alpha - lastCheckpointStep.alpha);
+
+return result.element;
+\end{code}
+
+\subsubsection{Implementasi Fungsi Pengacakan Posisi Awal}
+
+Subbab ini menjabarkan implementasi fungsi pengacakan posisi awal yang akan digunakan apabila terjadi kasus yang menyebabkan metode \textit{Pollard Rho} gagal memberikan keluaran yang benar seperti yang dijelaskan pada subbab \ref{sec:Brent Cycle Detection}. Implemetasi fungsi ini dapat dilihat pada kode sumber \ref{code:randomize_step}
+\begin{code}[firstnumber=0]{Fungsi Pengacakan Posisi Awal}{randomize_step}
+static step randomizeStartingStep (const uint64 & generator, const uint64 & order, const uint64 & modulo, const uint64 & query)
+uint64 upperLimit = order - 1;
+ZElement alpha (order, 1 + (rand() % upperLimit));
+ZElement beta (order, 1 + (rand() % upperLimit));
+
+ZElement poweredAlpha = modularExponentiation (ZElement (modulo, generator, order), alpha.element);
+ZElement poweredBeta = modularExponentiation (ZElement (modulo, query, order), beta.element);
+
+ZElement value = poweredAlpha * poweredBeta;
+
+return step (value, alpha, beta);
+\end{code}
+
+\subsection{Implementasi Fungsi Pemangkatan Modular}
+
+Subbab ini menjabarkan implementasi fungsi pemangkatan modular yang dijelaskan pada subbab \ref{sec:Desain Fungsi Modular Exponentiation}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:modex}.
+\begin{code}[firstnumber=0, float=h!]{Fungsi Pemangkatan Modular}{modex}
+ZElement modularExponentiation (ZElement generator, uint64 exponent)
+ZElement result (generator.character, 1);
+if (exponent >= generator.order)
+exponent = exponent % generator.order;
+
+for (; exponent > 0; exponent = exponent >> 1)
+{
+	if (exponent & 1 == 1)
+	{
+		result = result * generator;
+	}
+	
+	generator = generator * generator;
+}
+
+return result;
+\end{code}
+
+\subsection{Implementasi Fungsi Perkalian Modular dengan Logarithmic Modular Multiplication}
+
+Subbab ini menjabarkan implementasi fungsi \textit{Logarithmic Modular Multiplication} yang dijelaskan pada subbab \ref{sec:Desain Fungsi Logarithmic Modular Multiplication}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:modmul}.
+\begin{code}[firstnumber=0, float=h!]{Fungsi \textit{Logarithmic Modular Multiplication}}{modmul}
+uint64 modularMultiplication (uint64 multiplier, uint64 multiplicand, uint64 modulo)
+multiplier = multiplier % modulo;
+multiplicand = multiplicand % modulo;
+
+if ( multiplier < multiplicand )
+std::swap (multiplier, multiplicand);
+
+uint64 result = 0;
+
+while (multiplier > 0)
+{
+	if ( multiplier & 1 == 1 )
+	{
+		result = (result + multiplicand) % modulo;
+	}
+	
+	multiplier >>= 1;
+	multiplicand = (multiplicand << 1) % modulo;
+}
+
+return result;
+\end{code}
+
+Untuk mempercepat kinerja fungsi, \textit{sentinel} perulangan yang digunakan adalah nilai terkecil antara \textit{multiplier} dan \textit{multiplicand}.
+
+\subsection{Implementasi Fungsi Invers Modulus}
+
+Subbab ini menjabarkan implementasi fungsi invers modulus yang dijelaskan pada subbab \ref{sec:Desain Fungsi Invers Modulus}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:modinv}.
+\begin{code}[firstnumber=0, float=h!]{Fungsi Invers Modulus}{modinv}
+uint64 modularInverse (uint64 value, uint64 modulus)
+int64 valueCoeff, modulusCoeff;
+extendedEuclidean (modulus, value % modulus, modulusCoeff, valueCoeff);
+
+return (valueCoeff < 0) ? valueCoeff + (int64) modulus : valueCoeff;
+\end{code}
+
+\subsection{Implementasi Fungsi Sign}
+
+Subbab ini menjabarkan implementasi fungsi \textit{Sign} yang dijelaskan pada subbab \ref{sec:Desain Fungsi Sign}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:sign}.
+\begin{code}[firstnumber=0, float]{Fungsi \textit{Sign}}{sign}
+std::pair <ZElement, ZElement> sign (const uint64 & message, const uint64 & globalModulo, const uint64 & generator, const uint64 & keyModulo, const uint64 & index) 
+std::pair <ZElement, ZElement> output ((ZElement) {globalModulo, 0}, (ZElement) {globalModulo, 0});
+
+ZElement temporalKeypair (globalModulo, 1);
+do
+{
+	temporalKeypair += 1;
+	
+	output.first = modularExponentiation (ZElement (keyModulo, generator, globalModulo), temporalKeypair.element);
+	output.first = ZElement (globalModulo, output.first.element);
+	
+	if (output.first.element == 0)
+	{
+		continue;
+	}
+	
+	ZElement inverseTemporalKeypair = temporalKeypair.invert();
+	ZElement transformedMessage = ZElement (globalModulo, message + (output.first * index).element);
+	
+	output.second = inverseTemporalKeypair * transformedMessage;
+	
+	if (output.second.element == 0)
+	{
+		output.first.element = 0;
+		continue;
+	}
+} while (output.first.element == 0);
+
+return output;
+\end{code}
+
+\subsection{Implementasi Fungsi Uji Kebenaran}
+
+Subbab ini menjabarkan implementasi fungsi uji kebenaran yang dijelaskan pada subbab \ref{sec:Desain Fungsi Uji Kebenaran}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:verify}.
+\begin{code}[firstnumber=0]{Fungsi Uji Kebenaran}{verify}
+bool verify (const uint64 & globalModulo, const uint64 & keyModulo, const uint64 & generator, const uint64 & query, const uint64 & message, std::pair <ZElement, ZElement> signature)
+ZElement w = signature.second.invert();
+ZElement u1 = w * message;
+ZElement u2 = w * signature.first;
+ZElement poweredG = modularExponentiation (ZElement (keyModulo, generator, keyModulo - 1), u1.element);
+ZElement poweredY = modularExponentiation (ZElement (keyModulo, query, keyModulo - 1), u2.element);
+ZElement v (globalModulo, (poweredG * poweredY).element);
+return v.element == signature.first.element;
+\end{code}
+
+\section{Implementasi Program Pembuat Data Uji}
+
+Subbab ini akan menjelaskan mengenai implementasi program pembuatan data uji, mengikuti penjelasan pada subbab \ref{sec:Desain Program Pembuat Data Uji}.
+
+\subsection{Penggunaan Library, Konstanta, dan Struct}
+
+Program ini menggunakan \textit{library} bawaan C++, yaitu \texttt{cstdio} yang digunakan untuk menerima dan mengeluarkan hasil luaran program, \texttt{cstdlib} yang digunakan untuk melakukan randomisasi, \texttt{ctime} sebagai \textit{library} untuk melakukan \textit{random seeding}, dan \texttt{utility} yang digunakan untuk melakukan penukaran dua variabel. Selain \textit{library}, sebuah tipe data \textit{unsigned integer} 64-bit juga didefinisikan dengan nama \texttt{uint64}. Keseluruhan penggunaan \textit{library} dan konstanta dapat dilihat pada kode sumber \ref{code:header_generator}.
+\begin{code}[firstnumber=1]{\textit{Header} Program Pembuat Data Uji}{header_generator}
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <utility>
+
+#define uint64 unsigned long long
+\end{code}
+
+\subsection{Implementasi Fungsi Main}
+
+Fungsi ini merupakan inti seluruh program. Fungsi ini tidak menerima masukan. Masukan akan diberikan secara \textit{hard-coded}. Masukan tersebut diantaranya adalah nilai $ N $ , nilai $ L $, dan banyaknya pasangan data menurut masukan $ N $ dan $ L $. Pada kode sumber berikut ini, nilai $ N $ adalah 7, nilai $ L $ adalah 10 hingga 60, dan banyaknya pasangan data menurut masukan $ N $ dan $ L $ adalah 7. Kode sumber yang dimaksud dapat dilihat pada kode sumber \ref{code:main_generator}
+\begin{code}[firstnumber=0]{Fungsi \textit{Main} Program Pembuat Data Uji}{main_generator}
+int main()
+srand (time(NULL));
+for (int i = 10; i <= 60; i++)
+{
+	printf ("[N = %d, L = %d]\n", 7, i);
+	generateKeypair(7, i, 7);
+}
+
+return 0;
+\end{code}
+
+\subsection{Implementasi Fungsi Perkalian Modular}
+
+Fungsi ini merupakan implementasi desain fungsi \textit{Logarithmic Modular Multiplication} pada subbab \ref{sec:Desain Fungsi Logarithmic Modular Multiplication}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:modmul_generator}
+\begin{code}[firstnumber=0]{Fungsi \textit{Logarithmic Modular Multiplication}}{modmul_generator}
+uint64 modularMultiplication (const uint64 & cMultiplicand, const uint64 & cMultiplier, const uint64 & modulus)
+uint64 multiplicand = cMultiplicand % modulus;
+uint64 multiplier = cMultiplier % modulus;
+
+if ( multiplier < multiplicand )
+std::swap (multiplier, multiplicand);
+
+uint64 result = 0;
+
+while ( multiplier > 0 )
+{
+	if ( multiplier & 1 == 1 )
+	{
+		result = (result + (multiplicand % modulus)) % modulus;
+	}
+	
+	multiplier >>= 1;
+	multiplicand = (multiplicand << 1) % modulus;
+}
+
+return result;
+\end{code}
+
+\subsection{Implementasi Fungsi Pemangkatan Modular}
+
+Fungsi ini merupakan implementasi desain pada subbab \ref{sec:Desain Fungsi Modular Exponentiation}. Terdapat sedikit penyederhanaan pada parameter masukan, yaitu hilangnya parameter \textit{order}. Fungsi ini mengasumsikan \textit{order} sebuah elemen adalah $ modulo - 1 $. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:modex_generator}.
+
+\pagebreak
+
+\begin{code}[firstnumber=0]{Fungsi Pemangkatan Modular}{modex_generator}
+uint64 modularExponentiation (uint64 modulo, uint64 generator, uint64 index)
+uint64 result = 1;
+index = index % (modulo - 1);   //  Fermat's little theorem
+
+for (uint64 basis = generator; index > 0; index = index >> 1)
+{
+	if (index & 1 == 1)
+	result = modularMultiplication (result, basis, modulo);
+	basis = modularMultiplication (basis, basis, modulo);
+}
+
+return result;
+\end{code}
+
+\subsection{Implementasi Fungsi Pengecekan Keprimaan}
+
+Fungsi ini mengikuti desain pada subbab \ref{sec:Desain Fungsi Pengecekan Keprimaan}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:primality_test_1} dan \ref{code:primality_test_2}.
+\begin{code}[firstnumber=0]{Fungsi Pengecekan Keprimaan (bg. 1)}{primality_test_1}
+bool isPrime (uint64 value)
+if ( value < 2 ) return false;
+if ( value == 2 ) return true;
+if ( value % 2 == 0 ) return false;
+
+static uint64 primeLimit[12] = {2047, 1373653, 25326001, 3215031751, 2152302898747, 3474749660383, 341550071728321, 341550071728321, 3825123056546413051, 3825123056546413051, 3825123056546413051};
+
+int limit;
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last, float=h!]{Fungsi Pengecekan Keprimaan (bg. 2)}{primality_test_2}
+for (limit = 0; limit < 12; limit++)
+	if (value < primeLimit[limit])
+		break;
+uint64 s = 0;
+uint64 r = value - 1;
+while ( (r % 2) == 0 )
+{
+	s++;
+	r = r >> 1;
+}
+
+static uint64 setA[12] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
+
+for (int i = 0; i < limit; i++)
+{
+	uint64 a = setA[i];
+	uint64 y = modularExponentiation(value, a, r);
+	
+	if ( (y != 1) && (y != (value - 1)) )
+	{
+		for (uint64 j = 0; j < s - 1 && y != value - 1; j++)
+		{			
+			y = modularMultiplication(y, y, value);
+			if ( y == 1 ) return false;
+		}
+		if ( y != (value-1) ) return false;
+	}
+}
+
+return true;
+\end{code}
+
+\subsection{Implementasi Fungsi Polinomial Pembuat Bilangan Prima}
+
+Fungsi ini merupakan implementasi desain pada subbab \ref{sec:Desain Fungsi Polinomial Prima}. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:prime_poly}.
+\begin{code}[firstnumber=0, float=h!]{Fungsi Polinomial Pembuat Bilangan Prima}{prime_poly}
+uint64 primePolynomial (uint64 n)
+return n * n + n + 41;
+\end{code}
+
+\subsection{Implementasi Fungsi Pembuat Data Uji}
+
+Fungsi ini merupakan implementasi desain pada subbab \ref{sec:Desain Fungsi Generate}. Terdapat sedikit penyesuaian di implementasi ini, yaitu parameter masukan $ Hm $ kini merupakan variabel yang nilainya dimasukkan secara \textit{hard-code} karena nilai ini tidak banyak berpengaruh pada proses pembuatan data uji. Selain itu, inkrementasi nilai $ p $ dilakukan dengan $ q $ untuk menjaga nilai $ p $ selalu habis dibagi dengan $ q $. Implementasi fungsi ini dapat dilihat pada kode sumber \ref{code:generator_1} dan \ref{code:generator_2}.
+\begin{code}[firstnumber=0]{Fungsi Pembuat Data Uji (bg. 1)}{generator_1}
+void generateKeypair (int N, int L, int limit)
+uint64 Hm = 101;
+uint64 NLimit = 1ULL << N;
+uint64 LLimit = 1ULL << L;
+uint64 lowerNLimit = 1ULL << (N - 1);
+uint64 lowerLLimit = 1ULL << (L - 1);
+uint64 q = 0;
+int i = std::floor (std::pow (lowerNLimit, 0.5));
+for (; limit > 0 && q < NLimit; )
+{
+	q = primePolynomial(i++);
+	if ( q < lowerNLimit || ! isPrime (q) ) continue;
+	
+	uint64 p = lowerLLimit;
+	for (p += q - (p % q); p < LLimit && limit > 0; p += q)
+	{
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{Fungsi Pembuat Data Uji (bg. 2)}{generator_2}
+		if ( ! isPrime (p + 1)) continue;
+		
+		uint64 g = 1;
+		bool solved = false;
+		for (uint64 h = 2; h < q; h += 1)
+		{
+			g = modularExponentiation (p + 1, h, p / q);
+			if ( g != 1 && modularExponentiation (p + 1, g, q) == 1 )
+			{
+				solved = true;
+				break;
+			}
+		}
+		
+		if ( g == 1 || !solved ) continue;
+		
+		uint64 x = 1 + rand() % (q - 1);
+		uint64 y = modularExponentiation (p + 1, g, x);
+		
+		printf ("%d %d %llu %llu %llu %llu %llu [%llu]\n", N, L, q, p + 1, g, y, Hm, x);
+		limit--;
+	}
+}
+\end{code}

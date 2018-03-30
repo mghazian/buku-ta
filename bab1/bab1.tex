@@ -1,0 +1,80 @@
+\vspace{0ex}
+\chapter {PENDAHULUAN}
+
+Pada bab ini, akan dijelaskan mengenai latar belakang, rumusan masalah, Batasan masalah, tujuan, metodologi pengerjaan, dan sistematika penulisan tugas akhir.
+
+\section{Latar Belakang}
+
+\par Permasalahan yang akan dijelaskan merupakan permasalahan pada situs Timus Online Judge pada soal 1598 DSA Attack. Pada permasalahan ini diberikan sekelompok parameter public key (N, L, q, p, g, y, Hm). Dengan parameter ini, soal meminta untuk dibuatkan sepasang nilai (\textit{r, s}). Pasangan nilai (\textit{r, s}) merupakan hasil proses signing pada metode digital signature.
+
+Soal telah menjelaskan langkah-langkah untuk membuat parameter, melakukan \textit{signing}, hingga melakukan verifikasi. Pada salah satu tahapan \textit{signing}, nilai \textit{private key x} dibutuhkan, sedangkan \textit{private key} tersebut tidak diberikan sebagai input. Pada soal, nilai \textit{private key x} disebutkan di bagian prosedur pembuatan parameter. Mengutip laman problem DSA Attack, prosedur pembuatan parameter dijelaskan sebagai berikut:
+
+\begin{enumerate}
+\item Tentukan sebuah nilai \textit{x} secara acak dimana $0 < x < q$.
+\item Hitung nilai $y = g^x\ mod\ p$.
+\item Keluarkan nilai public key (\textit{p, q, g, y}) dengan \textit{private key x}.
+\end{enumerate}
+
+Berdasarkan prosedur pembuatan parameter, nilai \textit{x} digunakan bersama dengan \textit{y}, \textit{g}, dan \textit{p}. Tepatnya, nilai \textit{x} digunakan pada persamaan $y = g^x\ mod\ p$. Karena nilai \textit{y}, \textit{g}, dan \textit{p} telah diberikan sebagai input, nilai \textit{x} secara teori bisa dicari. Model permasalahan ini disebut dengan \textit{Discrete Logarithm Problem}.
+
+Secara garis besar, \textit{Discrete Logarithm Problem} sekaligus permasalahan DSA Attack dapat diselesaikan menggunakan salah satu dari dua metode: \textit{Baby-step Giant-step} dan \textit{Pollard Rho}. Kedua metode ini memiliki order fungsi pertumbuhan yang sama. Kendati begitu, didapati bahwa hanya satu metode yang dapat digunakan sebagai solusi permasalahan DSA Attack, yaitu \textit{Baby-step Giant-step}. Tugas akhir ini ditujukan untuk menggali lebih dalam terkait penyebab fenomena tersebut.
+
+\section {Rumusan Masalah}
+
+Permasalahan yang akan diselesaikan pada tugas akhir ini adalah sebagai berikut:
+
+\begin {enumerate}
+\item Bagaimana performa metode \textit{Baby-step Giant-step} yang diimplementasikan pada saat menyelesaikan permasalahan DSA Attack?
+\item Bagaimana performa metode \textit{Pollard Rho} yang diimplementasikan pada saat menyelesaikan permasalahan DSA Attack?
+\item Perbedaan apa, jika ada, yang menyebabkan metode Baby-step Giant-step dapat digunakan sebagai metode penyelesaian DSA Attack namun metode Pollard Rho tidak?
+\end {enumerate}
+
+\section {Batasan Masalah}
+
+Masalah yang akan diselesaikan memiliki batasan-batasan berikut:
+
+\begin {enumerate}
+\item Implementasi dilakukan menggunakan bahasa pemrograman C++.
+\item Nilai hash pesan memiliki panjang paling sedikit 3 bit, dan paling banyak 36 bit. 
+\item Parameter \textit{public key q} memiliki panjang paling sedikit 3 bit, dan paling banyak 36 bit. Panjang parameter \textit{q} sama dengan panjang nilai \textit{hash} pesan.
+\item Parameter \textit{public key p} memiliki panjang paling sedikit 6 bit, dan paling banyak 60 bit. Panjang \textit{p} harus setidaknya 3 bit lebih panjang daripada \textit{q}.
+\item Parameter \textit{public key g} memiliki rentang nilai $1 < g < p$.
+\item Parameter \textit{public key y} memiliki rentang nilai $0 \leq y < p$.
+\end {enumerate}
+
+\section {Tujuan}
+
+Tujuan tugas akhir ini adalah sebagai berikut:
+
+\begin{enumerate}
+\item Mengevaluasi performa metode \textit{Baby-step Giant-step} yang diimplementasikan untuk menyelesaikan permasalahan DSA Attack.
+\item Mengevaluasi performa metode \textit{Pollard Rho} yang diimplementasikan untuk menyelesaikan permasalahan DSA Attack.
+\item Membandingkan performa metode \textit{Baby-step Giant-step} dengan \textit{Pollard Rho} yang diimplementasikan untuk menyelesaikan permasalahan DSA Attack.
+\end{enumerate}
+
+\section {Metodologi}
+
+Metodologi pengerjaan yang digunakan pada tugas akhir ini memiliki beberapa tahapan. Tahapan-tahapan tersebut yaitu:
+
+\begin{enumerate}
+\item Penyusunan proposal\\
+Pada tahapan ini penulis memberikan penjelasan mengenai apa yang penulis akan lakukan dan mengapa tugas akhir ini dilakukan. Penjelasan tersebut dituliskan dalam bentuk proposal tugas akhir.
+\item Studi literatur\\
+Pada tahapan ini penulis mengumpulkan referensi yang diperlukan guna mendukung pengerjaan tugas akhir. Referensi yang digunakan dapat berupa hasil penelitian yang sudah pernah dilakukan, buku, artikel internet, atau sumber lain yang bisa dipertanggungjawabkan.
+\item Implementasi algoritma\\
+Pada tahapan ini penulis mulai mengembangkan algoritma yang digunakan untuk menyelesaiakan permasalahan DSA Attack.
+\item Pengujian dan evaluasi\\
+Pada tahapan ini penulis menguji performa algoritma yang digunakan. Hasil pengujian kemudian dievaluasi untuk kemudian dipertimbangkan apakah algoritma masih bisa ditingkatkan lagi atau tidak.
+\item Penyusunan buku\\
+Pada tahapan ini penulis menyusun hasil pengerjaan tugas akhir mengikuti format penulisan tugas akhir.
+\end{enumerate}
+
+\section {Sistematika Penulisan}
+
+Sistematika laporan tugas akhir yang akan digunakan adalah sebagai berikut:
+
+\begin{enumerate}
+\item Bagian awal, meliputi halaman depan, halaman pengesahan, abstrak, kata pengantar, daftar isi, daftar gambar, dan daftar tabel.
+\item Bagian inti, meliputi pendahuluan, tinjauan pustaka, metodologi, hasil dan pembahasan, dan kesimpulan dan saran.
+\item Bagian akhir, meliputi daftar pustaka, lampiran-lampiran, dan biodata penulis.
+\end{enumerate}

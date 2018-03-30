@@ -1,0 +1,107 @@
+%---------------------------------------------------------
+% setting.tex
+% Everything that covers about the document setting
+% and must be in preamble is to be implemented right here
+%---------------------------------------------------------
+
+%--		Whole document margin		--%
+\setlength {\parindent}{2.5em}
+\setlength {\parskip} {0.2em}
+
+\setlist[enumerate] {itemsep=0pt, topsep=6pt, partopsep=0pt, parsep=0pt}
+
+%--		Redactions		--%
+\captionsetup[table] {skip=6pt, name={Tabel }}
+\captionsetup[figure] {skip=6pt,name={Gambar }}
+\renewcommand {\lstlistingname}{Kode Sumber}
+\renewcommand {\chaptername}{BAB}
+\renewcommand {\contentsname}{DAFTAR ISI}
+\renewcommand {\listfigurename}{DAFTAR GAMBAR}
+\renewcommand {\listtablename}{DAFTAR TABEL}
+\renewcommand {\lstlistlistingname}{DAFTAR KODE SUMBER}
+
+%--		Document hierarchy depth		--%
+\setcounter{secnumdepth}{5}
+
+%--		Document fonts		--%
+\setmainfont{Times New Roman}
+\setmonofont{Courier New}
+
+%--		Set the \chapter		--%
+\titleformat {\chapter}				% section
+[display]							% shape
+{\Centering\bfseries}				% format
+{\chaptername \ \Roman{chapter}}	% label
+{0.4ex}								% label-section separator
+{}									% before code
+[]									% after 
+
+% for unknown reason, spacing should be set using the following format
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+%--		Set the \chapter*		--%
+\titleformat {name=\chapter,numberless}	% section
+[display]					% shape
+{\Centering\bfseries}		% format
+{}							% label
+{0.4ex}						% label-section separator
+{}							% before code
+[]							% after
+
+%--		Set the \section		--%
+\titleformat {\section}
+[hang]
+{\bfseries}
+{\thesection. }
+{0ex}
+{}
+[\vspace{-0.9em}]
+
+%--		Set the \subsection		--%
+\titleformat {\subsection}
+[hang]
+{\bfseries}
+{\thesubsection. }
+{0ex}
+{}
+[\vspace{-0.6em}]
+
+%--		Set the \subsubsection		--%
+\titleformat {\subsubsection}
+[hang]
+{\bfseries}
+{\thesubsubsection. }
+{0ex}
+{}
+[\vspace{-0.6em}]
+
+%--		Listing		--%
+\lstset{style=generic}
+\makeatletter
+\def\lst@PlaceNumber{\ifnum\value{lstnumber}=0\else
+	\llap{\normalfont\lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\fi}
+\makeatother
+
+%--		Bibliography		--%
+\defbibheading {bibliography}[DAFTAR PUSTAKA]{\chapter{#1}}
+\urlstyle{rm}
+
+%--		Table of Content	--%
+\setlength\cftparskip{-2pt}
+\setlength\cftbeforechapskip{0pt}
+\setlength{\lineskip}{0pt}
+
+% Chapter uses roman numeral
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\newcommand{\Romannumeral}[1]{\uppercase\expandafter{\romannumeral#1}}
+\renewcommand{\cftchappresnum}{\chaptername \ \Romannumeral}
+
+% Prefix each segment
+\renewcommand{\cfttabpresnum}{Tabel }
+\renewcommand{\cftfigpresnum}{Gambar }
+
+% Set each segment's indentation such that none will overlap
+\cftsetindents{chapter}{0em}{4.4em}
+\cftsetindents{section}{2em}{2em}
+\cftsetindents{figure}{0em}{6em}
+\cftsetindents{table}{0em}{5em}

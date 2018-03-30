@@ -1,0 +1,38 @@
+\documentclass[a5paper, twoside, 11pt, listof=nochaptergap] {book}
+
+\input {util/packages}
+\input {util/utils}
+\input {util/styles}
+\input {util/variables}
+\input {util/setting}
+\addbibresource{bib/source.bib}
+
+\begin{document}
+	%-- Things that should go first but can't be placed in preamble
+	% Figure numbering uses chapter numbering as prefix
+	\counterwithin {figure}{chapter}
+	
+	\pagestyle {normal}
+	%--
+	
+	\frontmatter
+		\include {pembuka/sampul}
+		\include {pembuka/lembar_pengesahan}
+		\include {pembuka/abstrak}
+		\include {pembuka/kata_pengantar}
+		\include {pembuka/daftar_isi}
+	
+	\mainmatter
+		\include {bab1/bab1} \cleardoublepage
+		\include {bab2/bab2} \cleardoublepage
+		\include {bab3/bab3} \cleardoublepage
+		\include {bab4/bab4} \cleardoublepage
+		\include {bab5/bab5} \cleardoublepage
+		\include {bab6/bab6} \cleardoublepage
+	
+	\backmatter
+		\include {penutup/daftar_pustaka}
+		\include {penutup/lampiran/lampiran_a}
+		\include {penutup/lampiran/lampiran_b}
+		\include {penutup/biodata}
+\end{document}

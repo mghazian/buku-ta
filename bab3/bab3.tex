@@ -1,0 +1,307 @@
+\chapter{DESAIN}
+
+Pada bab ini akan dijelaskan desain algoritma yang akan digunakan untuk menyelesaikan permasalahan.
+
+\section{Deskripsi Umum Sistem}
+
+Sistem akan menerima tujuh nilai masukan: $ N $, $ L $, $ q $, $ p $, $ g $, $ y $, $ Hm $. Nilai masukan ini mengikuti penjelasan pada subbab \ref{sec:Parameter Masukan}. Kemudian sistem akan mencari sebuah nilai $ x $ pada persamaan $ y=g^x\ (mod\ p) $. Nilai $ x $ ini akan digunakan pada tahapan pembuatan \textit{signature}, mengacu pada prosedur yang dijabarkan pada subbab \ref{sec:Keluaran Permasalahan}. Seusai pembuatan \textit{signature}, sistem akan mengeluarkan \textit{signature} yang telah dibuat yaitu sepasang nilai \textit{(r, s)}.
+
+Pada tahap penyelesaian logaritma diskret, sistem menggunakan dua metode yang berbeda. Masing-masing metode akan digunakan untuk dibandingkan kinerja satu sama lainnya.
+
+\section{Desain Program Utama}
+
+Subbab ini akan menjelaskan desain fungsi yang akan digunakan untuk menyelesaikan permasalahan.
+
+\subsection {Desain Fungsi Main}
+
+Pada fungsi ini, semua tahapan komputasi berjalan. Termasuk pada tahapan ini yaitu pencarian logaritma diskret dan pembuatan \textit{signature}. Fungsi ini menerima parameter secara interaktif dari pengguna, dan mengeluarkan hasil \textit{signature} \textit{(r, s)} secara interaktif kepada pengguna. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:main}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+MAIN
+let n, l, q, p, g, y, Hm = Input()
+let x = DISCRETE-LOG (q, p, g, y)
+let r, s = SIGN (q, p, g, Hm, x)
+output (r, s)
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Main}}
+\label{psdo:main}
+\end{figure}
+
+\subsection{Desain Fungsi Pencarian Logaritma Diskret}
+
+Terdapat dua metode pencarian logaritma diskret yang akan diujikan pada penyelesaian permasalahan. Subbab ini akan menjelaskan desain masing-masing metode.
+
+\subsubsection {Desain Fungsi Baby-step Giant-step}
+
+Subbab ini akan menjabarkan desain fungsi \textit{Baby-step Giant-step} menurut penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Baby-step Giant-step} dalam bentuk \textit{pseudocode}. Fungsi ini menerima tiga \textit{integer}, yaitu $ g $, $ y $, $ n $. Keluaran fungsi ini adalah sebuah \textit{integer} $ x $. Masukan dan keluaran fungsi ini mengacu pada persamaan \eqref{eq:persamaan_umum_log_diskret}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:bsgs}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+BABY-STEP-GIANT-STEP (g, y, n)
+let limit = sqrt (ord(g)) rounded upward
+let GIANTSTEPS[] be a new array
+let BABYSTEPS[] be a new array
+for i = 0 to limit-1
+	store pair <s = limit*i, t = g ^ (limit*i)> into GIANTSTEPS
+for j = 0 to limit-1
+	store pair <s = j, t = y * g^j> into BABYSTEPS
+find a match between GIANTSTEPS and BABYSTEPS on the t.
+if a pair (x, y) such that said match exist
+	return GIANTSTEPS[x].s – BABYSTEPS[y].s
+return "NOT FOUND"
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Baby-step Giant-step}}
+\label{psdo:bsgs}
+\end{figure}
+
+\subsubsection {Desain Fungsi Pollard Rho dengan Brent Cycle Detection}
+
+Subbab ini akan menjabarkan desain fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection} menurut penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Pollard Rho} dan \ref{sec:Brent Cycle Detection}. Fungsi ini menerima tiga \textit{integer}, yaitu $ g $, $ y $, dan $ n $. Keluaran fungsi ini adalah \textit{integer} $ x $. Masukan dan keluaran fungsi ini mengacu pada persamaan \eqref{eq:persamaan_umum_log_diskret}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:brent_pollard_rho}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+POLLARD-RHO-BRENT (g, y, n)
+let p1 = 1, p2 = 1
+let i = 2
+let iteration = 0
+do
+	move p1 forward once 
+	iteration = iteration + 1
+	if iteration == 2^i
+		move p2 to p1
+		i = i + 1
+		iteration = 0
+while p1 != p2
+let inverse = (p1.b – p2.b)-1 (mod n)
+return (p2.a – p1.a) * inverse (mod n)
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection}}
+\label{psdo:brent_pollard_rho}
+\end{figure}
+
+\subsubsection {Desain Fungsi Step Untuk Pollard Rho}
+Subbab ini akan menjabarkan desain fungsi \textit{Step} pada \textit{Pollard Rho}. Pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Pollard Rho}. dijelaskan bahwa fungsi step butuh mempartisikan himpunan $ \mathbb{Z}_p $ menjadi tiga himpunan. Partisi ini dapat dilakukan dengan mudah dengan melakukan modulus setiap elemen $ \mathbb{Z}_p $ dengan 3, sehingga terbentuk tiga kelas residu: $ [0]_3,[1]_3,[2]_3 $. Ketiga kelas residu ini merepresentasikan tiga himpunan yang digunakan fungsi \textit{}step, dimana $ S_1=[1]_3 $, $ S_2=[0]_3 $, dan $ S_3=[2]_3 $.
+
+Fungsi ini menerima empat \textit{integer} sebagai parameter. Keluaran fungsi ini adalah sebuah \textit{integer} hasil proses \textit{step}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:step}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+STEP (value, alpha, beta, modulus)
+let class = value mod 3
+if class == 0
+	value = MODULAR-MULTIPLICATION (value, value, modulus)
+else if class == 1
+	value = MODULAR-MULTIPLICATION (value, beta, modulus)
+else
+	value = MODULAR-MULTIPLICATION (value, alpha, modulus)
+return value
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Step}}
+\label{psdo:step}
+\end{figure}
+
+\subsection{Desain Fungsi Sign}
+
+Subbab ini akan menjabarkan desain fungsi Sign yang mengikuti prosedur pada subbab \ref{sec:Keluaran Permasalahan}. Fungsi ini menerima lima \textit{integer} sebagai parameter dan dua \textit{integer} sebagai keluaran. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:sign}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+SIGN (globalMod, keyMod, g, hash, x)
+let i = 1
+let r, s = 0, 0
+
+while r == 0 do
+	i = i + 1
+	r = MODULAR-EXPONENTIATION (g, i, keyMod, globalMod)
+	if r != 0
+		let inverse = MODULAR-INVERSE (generator, keyMod)
+		s = (hash + r * x) mod q
+		s = (s * inverse) mod q
+		if s != 0
+			return (r, s)
+	r = 0
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Sign}}
+\label{psdo:sign}
+\end{figure}
+
+\subsection{Desain Fungsi Modular Exponentiation}
+
+Subbab ini akan menjabarkan desain fungsi \textit{Modular Exponentiation}, mengacu pada penjelasan pada subbab \ref{sec:Strategi Penyelesaian Pemangkatan Modular dengan Repeated Squaring}. Fungsi ini menghitung $ g^k\ mod\ p $, dimana $ g $ memiliki order elemen $ q $. Fungsi ini menerima empat \textit{integer} sebagai input dan mengeluarkan sebuah \textit{integer} sebagai hasil penghitungan pemangkatan modular. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modex}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+MODULAR-EXPONENTIATION (g, k, p, q)
+let result = 1
+let basis = 1
+k = k mod q
+let ~$ \left\langle k_0,\ k_1,\ \dots,\ k_n\right\rangle $~ be a bit representation of k where ki is the ith bit.
+for i = 1 to n
+	basis = (basis * g) mod p
+		if ~$ k_i $~ == 1
+		result = (result * basis) mod p
+return result
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Modular Exponentiation}}
+\label{psdo:modex}
+\end{figure}
+
+\subsection{Desain Fungsi Logarithmic Modular Multiplication}
+
+Subbab ini akan menjabarkan desain fungsi \textit{Logarithmic Modular Multiplication} mengikuti penjelasan pada subbab \ref{sec:Strategi Perkalian Modular dengan Logarithmic Modular Multiplication}. Fungsi ini menerima tiga masukan: sebuah nilai yang dikali $ a $, sebuah nilai pengali $ b $, dan sebuah modulus $ n $. Keluaran fungsi ini adalah sebuah \textit{integer} hasil perkalian. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modmul}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+LOGARITHMIC-MODULAR-MULTIPLICATION (a, b, n)
+let result = 1, basis = a
+let ~$ \left\langle b_1,\ b_2,\ \dots ,\ b_t \right\rangle $~ be the i-th bit representation for b
+for i = 1 to t
+	if ~$ b_i $~ == 1
+		result = (result + basis) mod n
+	basis = (basis * 2) mod n
+return result
+\end{lstlisting}
+\caption{Desain Fungsi Modular Multiplication}
+\label{psdo:modmul}
+\end{figure}
+
+\subsection{Desain Fungsi Invers Modulus}
+
+Fungsi ini digunakan pada banyak bagian penyelesaian permasalahan. Cara kerja fungsi ini mengacu pada penjelasan di subbab \ref{sec:Strategi Penyelesaian Invers Modulus dengan Extended Euclidean}. Fungsi menerima sebuah persamaan \ref{eq:persamaan_umum_pembagian}. Keluaran metode ini adalah koefisien sebuah nilai $ a $ dan sebuah modulus $ b $. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modinv}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+MODULAR-INVERSE (a = qb + r)
+let EQUATION[] be a new array
+let i = 0
+while r != 0
+	EQUATION[i] = (a = qb + r)
+	find equation b = qr + m for some q and m
+	i = i + 1
+for i = EQUATION.len – 2 downto 0
+	substitute EQUATION[i].b with EQUATION[i+1].r
+return (EQUATION[0].a.coefficient, EQUATION[0].b.coefficient)
+\end{lstlisting}
+\caption{Desain Fungsi Invers Modulus}
+\label{psdo:modinv}
+\end{figure}
+
+\subsection{Desain Fungsi Uji Kebenaran}
+
+Fungsi uji kebenaran digunakan untuk melakukan uji coba kebenaran keseluruhan program pada tahapan komputasi utama. Fungsi ini akan digunakan sebagai \textit{catch-all error detection} untuk membantu proses \textit{debugging}. Fungsi ini bekerja mengikuti prosedur pada subbab \ref{sec:Lain-lain}.
+
+Fungsi ini menerima tujuh integer sebagai masukan dimana lima pertama merupakan masukan soal, dan dua selanjutnya merupakan \textit{signature} yang dibuat. Keluaran fungsi ini adalah enumerasi benar\textendash salah. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:verify}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+VERIFY (q, p, g, y, Hm, r, s)
+let w = MODULAR-INVERSE (s, q)
+let u1 = MODULAR-MULTIPLICATION (w, Hm, q)
+let u2 = MODULAR-MULTIPLICATION (w, r, q)
+let g' = MODULAR-EXPONENTIATION (g, u1, p, p-1)
+let y' = MODULAR-EXPONENTIATION (y, u2, p, p-1)
+let v = MODULAR-MULTIPLICATION (g’, y’, q)
+if v == r
+	return "SIGNATURE CORRECT"
+return "SIGNATURE INCORRECT"
+\end{lstlisting}
+\caption{Desain Fungsi Uji Kebenaran}
+\label{psdo:verify}
+\end{figure}
+
+\section{Desain Program Pembuat Data Uji}
+
+Program tahapan komputasi utama memiliki masukan yang tidak sembarangan. Masukan program memiliki sifat-sifat yang dijelaskan pada subbab \ref{sec:Parameter Masukan}. Program ini membentuk data uji untuk membantu memeriksa kebenaran program utama.
+
+\subsection{Desain Fungsi Main Program Pembuat Data Uji}
+
+Semua hal yang berkaitan dengan pembuatan data uji berjalan pada fungsi ini. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:main_generator}.
+
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+MAIN
+let begin = Input()
+let end = Input()
+let bitDifference = Input()
+let limit = Input()
+let Hm = Input()
+for i = begin to end
+	GENERATE (i, i + bitDifference, Hm, limit)
+\end{lstlisting}
+\caption{Desain Fungsi Utama Pembuat Data Uji}
+\label{psdo:main_generator}
+\end{figure}
+
+\subsection{Desain Fungsi Pengecekan Keprimaan}
+
+Subbab ini akan menjelaskan metode pengecekan keprimaan berdasarkan penjelasan pada subbab \ref{sec:Miller-Rabin Primality Test}. Masukan fungsi ini adalah sebuah bilangan \textit{integer}. Keluaran fungsi ini adalah enumerasi prima\textendash komposit. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:miller_rabin}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+IS-PRIME (value)
+if value == 2
+	return "PRIME"
+if value < 2 or value is divisible with 2
+	return "COMPOSITE"
+let s = 0
+let r = value – 1
+while r is divisible with 2
+	s = s + 1
+	r = r / 2
+let PRIMES be array of 12 first primes
+let LIMITS be array of 12 Miller-Rabin upper limits
+let limit = first index where value < LIMITS[index]
+for i = 0 to limit - 1
+	let m = MODULAR-EXPONENTIATION (value, a[i], r, r-1)
+	if y != 1 or y != (value – 1)
+		let j = 1
+		while j < s-1 and y != (value – 1)
+			y = (y * y) mod value
+			if y == 1
+				return "PRIME"
+			j = j + 1
+		if y != (value – 1)
+			return "COMPOSITE"
+return "PRIME"
+\end{lstlisting}
+\caption{Desain Fungsi Pengecekan Keprimaan Miller Rabin}
+\label{psdo:miller_rabin}
+\end{figure}
+
+\subsection{Desain Fungsi Polinomial Prima}
+
+Fungsi ini mengevaluasi polinomial pada persamaan \eqref{eq:polinomial_pembuat_prima} pada subbab \ref{sec:Polinomial Pembuat Bilangan Prima} untuk membentuk bilangan prima. Fungsi ini menerima sebuah \textit{integer} sebagai masukan, dan mengeluarkan \textit{integer} sebagai keluaran. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:prime_generator_polynomial}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+POLY-PRIME (n)
+return n*n + n + 41
+\end{lstlisting}
+\caption{Desain Fungsi Polinomial Pembuat Bilangan Prima}
+\label{psdo:prime_generator_polynomial}
+\end{figure}
+
+\subsection{Desain Fungsi Generate}
+
+Fungsi ini bertujuan untuk membuat data uji dengan karakteristik masukan yang diberikan. Dalam satu pemanggilan fungsi, akan dibuatkan paling banyak sebanyak \textit{limit} data uji yang memenuhi karakteristik masukan. Fungsi ini menerima empat \textit{integer} sebagai masukan, dan delapan \textit{integer} sebagai keluaran. Tujuh dari delapan \textit{integer} pertama merupakan nilai masukan soal mengikuti penjelasan di subbab \ref{sec:Parameter Masukan}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:generate}.
+\begin{figure}[h!]
+\begin{lstlisting}[firstnumber=0]
+GENERATE (N, L, Hm, limit)
+let NLimit be the highest N-bit value possible
+let LLimit be the highest L-bit value possible
+let NBegin be the highest (N-1)-bit value possible
+let LBegin be the highest (L-1)-bit value possible
+let q = 0
+let i = sqrt (NBegin)
+while q < NLimit
+	q = POLY-PRIME (i)
+	i = i + 1
+	if IS-PRIME (q) == "COMPOSITE" or q < NBegin
+		continue
+	for p = LBegin + q – (LBegin mod q) to LLimit
+		if IS-PRIME (p) == "COMPOSITE" or p is not divisible with q
+			continue
+		let g = 1
+		for k = 2 to q-1
+			find a value of g = k^(p/q) mod (p+1) that doesn’t result in 1 and g^q mod (p+1) results in 1
+			if such g found
+			let x a random value between 1 and q-1 inclusive
+			let y = MODULAR-EXPONENTIATION (g, x, j + 1, j)
+			output (N, L, q, j + 1, g, y, Hm, x)
+			limit = limit - 1
+			if limit == 0
+				quit function
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Generate}}
+\label{psdo:generate}
+\end{figure}
