@@ -30,7 +30,7 @@ Pada pengujian lokal, dibutuhkan beberapa data sebagai masukan. Untuk itu progra
 \item Kelompok data masukan dengan nilai L tetap. Nilai masukan lain menyesuaikan.
 \end{enumerate}
 
-Untuk lebih merepresentasikan data masukan, nilai $ q $ dan $ p $ pada tiap data masukan diatur supaya berada pada rentang $ 2^{N-1} \leq q < 2^N $ dan $ 2^{L-1} \leq p < 2^L $. Data masukan didesain agar merentang sebanyak mungkin kasus uji. Pada data masukan dimana $ N $ bernilai tetap, nilai $ L $ merentang pada nilai $ N+3 \leq L \leq 60 $. Sedangkan pada data masukan dimana $ L $ bernilai tetap, nilai $ N $ merentang pada nilai $ 10 \leq N < L $.  Setiap pasangan parameter (\textit{N, L}), dibuatkan maksimal 10 kasus uji yang berbeda-beda.
+Untuk lebih merepresentasikan data masukan, nilai $ q $ dan $ p $ pada tiap data masukan diatur supaya berada pada rentang $ 2^{N-1} \leq q < 2^N $ dan $ 2^{L-1} \leq p < 2^L $. Data masukan didesain agar merentang sebanyak mungkin kasus uji. Pada data masukan dimana $ N $ bernilai tetap, nilai $ L $ merentang pada nilai $ N+3 \leq L \leq 60 $\footnote{Pada praktiknya, pengujian dilakukan hanya sampai $ N = 53 $ karena keterbatasan sumber daya}. Sedangkan pada data masukan dimana $ L $ bernilai tetap, nilai $ N $ merentang pada nilai $ 10 \leq N < L $.  Setiap pasangan parameter (\textit{N, L}), dibuatkan maksimal 10 kasus uji yang berbeda-beda.
 
 \section{Uji Coba Kebenaran}
 
@@ -51,7 +51,7 @@ Kebenaran setiap metode diujikan dengan mengirim kode sumber terkait ke Timus On
 \end{figure}
 \end{enumerate}
 
-Pada kode sumber dengan metode \textit{Pollard Rho}, didapat umpan balik \textit{Time Limit Exceeded}. Mengingat pengujian kebenaran untuk metode \textit{Pollard Rho} tidak dapat dilakukan menggunakan pengujian luar, pengujian lokal akan digunakan. Hasil pengujian metode tersebut untuk setiap kelompok masukan dapat dilihat pada tabel \ref{tab:test_result_fixed_l} dan \ref{tab:test_result_fixed_n}.
+Umpan balik yang didapat kode sumber dengan metode \textit{Pollard Rho} adalah \textit{Time Limit Exceeded}. Karena pengujian kebenaran metode tersebut tidak dapat dilakukan dengan pengujian luar, pengujian lokal akan digunakan. Hasil pengujian metode tersebut untuk setiap kelompok masukan dapat dilihat pada tabel \ref{tab:test_result_fixed_l} dan \ref{tab:test_result_fixed_n}.
 
 \begin{table}[h!]
 \caption{Uji Kebenaran Metode Pollard Rho Dengan Data Masukan L Tetap}
@@ -60,26 +60,28 @@ Pada kode sumber dengan metode \textit{Pollard Rho}, didapat umpan balik \textit
 \hline
 N	&L	&Jumlah Kasus Uji	&Jumlah Benar	&N	&L	&Jumlah Kasus Uji	&Jumlah Benar \\
 \hline
-10	&60	&10					&10				&30	&60	&10					&10 \\
-11	&60	&10					&10				&31	&60	&10					&10 \\
-12	&60	&10					&10				&32	&60	&10					&10 \\
-13	&60	&10					&10				&33	&60	&10					&10 \\
-14	&60	&10					&10				&34	&60	&10					&10 \\
-15	&60	&10					&10				&35	&60	&10					&10 \\
-16	&60	&10					&10				&36	&60	&10					&10 \\
-17	&60	&10					&10				&37	&60	&10					&10 \\
-18	&60	&10					&10				&38	&60	&10					&10 \\
-19	&60	&10					&10				&39	&60	&10					&10 \\
-20	&60	&10					&10				&40	&60	&10					&10 \\
-21	&60	&10					&10				&41	&60	&10					&10 \\
-22	&60	&10					&10				&42	&60	&10					&10 \\
-23	&60	&10					&10				&43	&60	&10					&10 \\
-24	&60	&10					&10				&44	&60	&10					&10 \\
-25	&60	&10					&10				&45	&60	&10					&10 \\
-26	&60	&10					&10				&46	&60	&10					&10 \\
-27	&60	&10					&10				&47	&60	&10					&10 \\
-28	&60	&10					&10				&48	&60	&10					&10 \\
-29	&60	&10					&10				&49	&60	&10					&10 \\
+10&	60&	10&					10&				32&	60&	10&	10 \\ 
+11&	60&	10&					10&				33&	60&	10&	10 \\ 
+12&	60&	10&					10&				34&	60&	10&	10 \\ 
+13&	60&	10&					10&				35&	60&	10&	10 \\ 
+14&	60&	10&					10&				36&	60&	10&	10 \\ 
+15&	60&	10&					10&				37&	60&	10&	10 \\ 
+16&	60&	10&					10&				38&	60&	10&	10 \\ 
+17&	60&	10&					10&				39&	60&	10&	10 \\ 
+18&	60&	10&					10&				40&	60&	10&	10 \\ 
+19&	60&	10&					10&				41&	60&	10&	10 \\ 
+20&	60&	10&					10&				42&	60&	10&	10 \\ 
+21&	60&	10&					10&				43&	60&	10&	10 \\ 
+22&	60&	10&					10&				44&	60&	10&	10 \\ 
+23&	60&	10&					10&				45&	60&	10&	10 \\ 
+24&	60&	10&					10&				46&	60&	10&	10 \\ 
+25&	60&	10&					10&				47&	60&	10&	10 \\ 
+26&	60&	10&					10&				48&	60&	10&	10 \\ 
+27&	60&	10&					10&				49&	60&	10&	10 \\ 
+28&	60&	10&					10&				50&	60&	10&	10 \\ 
+29&	60&	10&					10&				51&	60&	10&	10 \\ 
+30&	60&	10&					10&				52&	60&	10&	10 \\ 
+31&	60&	10&					10&				53&	60&	10&	10 \\
 \hline
 \end{tabularx}
 \end{table}

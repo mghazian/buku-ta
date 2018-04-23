@@ -168,10 +168,10 @@ a=qn+b
 \label{eq:kelas_residu_umum}
 \end{equation}
 
-Diberikan suatu nilai $a$ dan $n$, terdapat banyak pasangan $(q,b)$ yang memenuhi persamaan \eqref{eq:kelas_residu_umum}. Namun ada satu pasangan yang memberikan nilai $b$ positif yang paling kecil, dimana $b$ berada pada rentang $0\le b<n$. Kesamaan nilai $b$ untuk nilai $n$ tertentu dan beberapa sembarang nilai $a$ dapat disampaikan dengan konsep kelas residu.
+Diberikan suatu nilai $a$ dan $n$, terdapat banyak pasangan $(q,b)$ yang memenuhi persamaan \eqref{eq:kelas_residu_umum}. Namun ada satu pasangan yang memberikan nilai $b$ non-negatif yang paling kecil, dimana $b$ berada pada rentang $0\le b<n$. Kesamaan nilai $b$ untuk nilai $n$ tertentu dan beberapa sembarang nilai $a$ dapat disampaikan dengan konsep kelas residu.
 Kelas residu adalah sebuah himpunan yang merepresentasikan sekumpulan nilai, dimana setiap nilai tersebut memiliki \textit{remainder} $b$ terhadap pembagi $n$ \cite{cormen_introduction,stallings_cryptography}. Nilai yang digunakan sebagai representasi umumnya bilangan non-negatif yang kurang dari $n$. Secara formal penjelasan ini dapat ditulis sebagai persamaan \eqref{eq:kelas_residu}
 \begin{equation}
-[r]_n=\{qn+r\ q\in \mathbb{Z}\}, \text{untuk sebuah nilai n tertentu}
+[r]_n=\{qn+r | q\in \mathbb{Z}\}, \text{untuk sebuah nilai n tertentu}
 \label{eq:kelas_residu}
 \end{equation}
 
@@ -213,9 +213,9 @@ Soal menyiratkan bahwa parameter $p$ memiliki nilai paling tinggi sekitar $2^{60
 Perkalian dua nilai yang mendekati $2^{60}$ dapat mengakibatkan \textit{integer overflow}. Maka pada proses perkalian di seluruh tahapan pembuatan \textit{signature}, prosedur perkalian harus menggunakan metode yang dapat menghindari \textit{integer overflow}. Strategi untuk mengatasi \textit{bottleneck} yang telah disebutkan akan dijelaskan pada subbab berikutnya.
 
 \section{Strategi Penyelesaian Pemangkatan Modular}
-Bagian ini akan menjelaskan beberapa variasi penyelesaian pencarian hasil pemangkatan pada persamaan kongruen yang dijabarkan pada persamaan \ref{eq:pemangkatan_modular}.
+Bagian ini akan menjelaskan beberapa variasi penyelesaian pencarian hasil pemangkatan pada persamaan kongruen yang dijabarkan pada persamaan \eqref{eq:pemangkatan_modular}.
 \begin{equation}
-g^k\in h\ mod\ p,\text{untuk g, k, dan p yang ditentukan}
+g^k \equiv h\ mod\ p,\text{untuk g, k, dan p yang ditentukan}
 \label{eq:pemangkatan_modular}
 \end{equation}
 
@@ -428,6 +428,7 @@ a=qb+r
 Persamaan \eqref{eq:persamaan_umum_pembagian} diberi batasan, yaitu nilai $ r $ harus kurang dari $ b $. Langkah transformasi adalah sebagai berikut.
 \begin{enumerate}
 \item Cari nilai $ q $ dan $ r $ yang memenuhi persamaan \eqref{eq:persamaan_umum_pembagian}.
+\item Simpan nilai $ a, b, q, $ dan $ r $ sebagai nilai persamaan iterasi ke-i.
 \item Cari bentuk persamaan \eqref{eq:persamaan_umum_pembagian} untuk $ b $ dengan cara melakukan modulus $ b $ dengan $ r $
 \item Ulangi langkah 2 hingga ditemukan $ r $ bernilai 0.
 \end{enumerate}
@@ -728,7 +729,7 @@ Kemudian jabarkan persamaan $ f_n (x_s)=f_n (x_t) $, $ s>t $ dalam bentuk persam
 f_n (x_s) &\equiv f_n (x_t)\ (mod\ n) \\
 \alpha^{a_s} * \beta^{b_s} &\equiv \alpha^{a_t} * \beta^{b_t}\ (mod\ n) \\
 \alpha^{a_s-a_t} &\equiv \beta^{b_t-b_s}\ (mod\ n) \\
-a_s - a_t &\equiv log_{\alpha} \beta * (b_t - b_s)\ (mod\ n)
+a_s - a_t &\equiv log_{\alpha} \beta * (b_t - b_s)\ (mod\ \phi(n))
 \label{eq:persamaan_umum_step_logaritmik}
 \end{align}
 Dengan memasukkan nilai $ \alpha=g $ dan $ \beta=y $, persamaan \eqref{eq:persamaan_umum_step_logaritmik} memberikan nilai logaritma diskret $ y $.
