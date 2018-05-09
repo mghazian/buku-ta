@@ -140,7 +140,7 @@ Pengujian menggunakan parameter masukan dengan $ N $ tetap dilakukan dengan lang
 	\item Ulangi untuk seluruh kasus uji.
 \end{enumerate}
 
-Prosedur ini penting untuk dilakukan untuk memperjelas fluktuasi waktu yang dibutuhkan dalam menyelesaikan permasalahan. Keluaran prosedur ini yaitu lamanya waktu yang dibutuhkan untuk menyelesaikan permasalahan untuk 10000 kali percobaan. Perlu diperhatikan bahwa penggunaan metode \textit{Pollard Rho} menggunakan fungsi \textit{pseudorandom}, sehingga satu kali percobaan menggunakan metode \textit{Pollard Rho} sangat mungkin menghasilkan waktu yang berbeda.
+Prosedur ini penting untuk dilakukan untuk memperjelas fluktuasi waktu yang dibutuhkan dalam menyelesaikan permasalahan. Keluaran prosedur ini yaitu lamanya waktu yang dibutuhkan untuk menyelesaikan permasalahan untuk 10000 kali percobaan. Perlu diperhatikan bahwa penggunaan metode \textit{Pollard Rho} menggunakan fungsi \textit{pseudorandom}, sehingga beberapa percobaan dengan satu masukan yang sama menggunakan metode \textit{Pollard Rho} sangat mungkin menghasilkan waktu yang berbeda.
 
 \begin{figure}[h!]
 	\Centering
@@ -167,7 +167,7 @@ Secara umum, dampak besarnya L terhadap pertumbuhan \textit{running time} permas
 
 \subsection{Pengujian Menggunakan Parameter Masukan dengan L Tetap}
 
-Grafik perbandingan kinerja dua metode (\ref{fig:mean_fixed_l} dan \ref{fig:stddev_fixed_l})untuk parameter masukan dengan nilai $ L $ tetap.
+Grafik perbandingan kinerja dua metode \ref{fig:mean_fixed_l} dan \ref{fig:stddev_fixed_l} menampilkan hasil pengujian untuk parameter masukan dengan nilai $ L $ tetap.
 
 \begin{figure}[h!]
 	\Centering
@@ -176,7 +176,7 @@ Grafik perbandingan kinerja dua metode (\ref{fig:mean_fixed_l} dan \ref{fig:stdd
 	\label{fig:mean_fixed_l}
 \end{figure}
 
-Grafik \ref{fig:mean_fixed_l} menunjukkan bahwa kedua metode memiliki pertumbuhan fungsi yang relatif sama. Pada $ N \geq 40 $, kedua grafik mulai melonjak naik. Namun terdapat sedikit perbedaan antar keduanya, yaitu metode rata-rata \textit{running time} \textit{Pollard Rho} lebih kecil daripada \textit{Baby-step Giant-step}. Berikutnya, grafik \ref{fig:stddev_fixed_l} akan menjelaskan mengenai standar deviasi kedua metode.
+Grafik \ref{fig:mean_fixed_l} menunjukkan bahwa kedua metode memiliki pertumbuhan fungsi yang relatif sama. Pada $ N \geq 40 $, kedua grafik mulai melonjak naik namun terdapat sedikit perbedaan di antara keduanya, yaitu metode rata-rata \textit{running time} \textit{Pollard Rho} lebih kecil daripada \textit{Baby-step Giant-step}. Berikutnya, grafik \ref{fig:stddev_fixed_l} akan menjelaskan mengenai standar deviasi kedua metode untuk kelompok masukan L tetap.
 
 \begin{figure}[h!]
 	\Centering
@@ -185,9 +185,9 @@ Grafik \ref{fig:mean_fixed_l} menunjukkan bahwa kedua metode memiliki pertumbuha
 	\label{fig:stddev_fixed_l}
 \end{figure}
 
-Berdasarkan grafik \ref{fig:stddev_fixed_l}, pertumbuhan fungsi standar deviasi kedua metode kontras dengan pertumbuhan fungsi rata-rata kedua metode. Pertumbuhan standar deviasi metode \textit{Pollard Rho} lebih besar dibanding metode \textit{Baby-step Giant-step}. Hal ini dapat dilihat pada $ N \geq 40 $.
+Berdasarkan grafik \ref{fig:stddev_fixed_l}, pertumbuhan standar deviasi metode \textit{Pollard Rho} lebih besar dibanding metode \textit{Baby-step Giant-step}. Hal ini dapat dilihat pada $ N \geq 40 $.
 
-Dari kedua pengujian kinerja terdapat kesamaan antara kedua metode terlepas dari jenis masukan yang digunakan.
+Dari pengujian kinerja, terdapat kesamaan antara metode \textit{Baby-step Giant-step} dan \textit{Pollard Rho} terlepas dari jenis masukan yang digunakan.
 
 \begin{enumerate}
 	\item Rata-rata kinerja metode \textit{Baby-step Giant-step} dan \textit{Pollard Rho} relatif sama
@@ -198,8 +198,8 @@ Dari kedua pengujian kinerja terdapat kesamaan antara kedua metode terlepas dari
 Selain itu berdasarkan uji kinerja dapat ditarik beberapa kesimpulan terkait waktu yang dibutuhkan untuk menyelesaikan permasalahan.
 
 \begin{enumerate}
-	\item Penyelesaian permasalahan dengan \textit{Baby-step Giant-step} akan membutuhkan waktu yang mendekati rata-rata \textit{running time} untuk kelompok masukan tersebut
-	\item Penyelesaian permasalahan dengan \textit{Pollard Rho} dapat berjalan jauh lebih cepat atau jauh lebih lambat dari rata-rata \textit{running time} untuk kelompok masukan tersebut
+	\item Penyelesaian permasalahan dengan \textit{Baby-step Giant-step} akan membutuhkan waktu yang mendekati rata-rata \textit{running time} metode tersebut
+	\item Penyelesaian permasalahan dengan \textit{Pollard Rho} dapat berjalan jauh lebih cepat atau jauh lebih lambat dari rata-rata \textit{running time} metode tersebut
 	\item Besarnya L memiliki pengaruh yang tidak begitu signifikan terhadap lamanya waktu penyelesaian
 	\item Besarnya N memiliki pengaruh yang signifikan terhadap lama waktu penyelesaian
 \end{enumerate}

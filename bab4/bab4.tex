@@ -668,14 +668,15 @@ int i = std::floor (std::pow (lowerNLimit, 0.5));
 for (; limit > 0 && q < NLimit; )
 {
 	q = primePolynomial(i++);
+\end{code}
+\pagebreak
+\begin{code}[firstnumber=last]{Fungsi Pembuat Data Uji (bg. 2)}{generator_2}
+	
 	if ( q < lowerNLimit || ! isPrime (q) ) continue;
 	
 	uint64 p = lowerLLimit;
 	for (p += q - (p % q); p < LLimit && limit > 0; p += q)
 	{
-\end{code}
-\pagebreak
-\begin{code}[firstnumber=last]{Fungsi Pembuat Data Uji (bg. 2)}{generator_2}
 		if ( ! isPrime (p + 1)) continue;
 		
 		uint64 g = 1;

@@ -13,12 +13,17 @@
 %--		Redactions		--%
 \captionsetup[table] {skip=6pt, name={Tabel }}
 \captionsetup[figure] {skip=6pt,name={Gambar }}
-\renewcommand {\lstlistingname}{Kode Sumber}
-\renewcommand {\chaptername}{BAB}
-\renewcommand {\contentsname}{DAFTAR ISI}
-\renewcommand {\listfigurename}{DAFTAR GAMBAR}
-\renewcommand {\listtablename}{DAFTAR TABEL}
-\renewcommand {\lstlistlistingname}{DAFTAR KODE SUMBER}
+
+% Babel is weird
+\addto\captionsindonesian
+{
+	\renewcommand {\lstlistingname}{Kode Sumber}
+	\renewcommand {\chaptername}{BAB}
+	\renewcommand {\contentsname}{DAFTAR ISI}
+	\renewcommand {\listfigurename}{DAFTAR GAMBAR}
+	\renewcommand {\listtablename}{DAFTAR TABEL}
+	\renewcommand {\lstlistlistingname}{DAFTAR KODE SUMBER}
+}
 
 %--		Document hierarchy depth		--%
 \setcounter{secnumdepth}{5}

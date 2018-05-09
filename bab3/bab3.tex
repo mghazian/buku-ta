@@ -273,7 +273,7 @@ return n*n + n + 41
 
 \subsection{Desain Fungsi Generate}
 
-Fungsi ini bertujuan untuk membuat data uji dengan karakteristik masukan yang diberikan. Dalam satu pemanggilan fungsi, akan dibuatkan paling banyak sebanyak \textit{limit} data uji yang memenuhi karakteristik masukan. Fungsi ini menerima empat \textit{integer} sebagai masukan, dan delapan \textit{integer} sebagai keluaran. Tujuh dari delapan \textit{integer} pertama merupakan nilai masukan soal mengikuti penjelasan di subbab \ref{sec:Parameter Masukan}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:generate}.
+Fungsi ini bertujuan untuk membuat data uji dengan karakteristik masukan yang diberikan. Dalam satu pemanggilan fungsi, akan dibuatkan paling banyak sebanyak \textit{limit} data uji yang memenuhi karakteristik masukan. Fungsi ini menerima empat \textit{integer} sebagai masukan, dan delapan \textit{integer} sebagai keluaran. Tujuh dari delapan \textit{integer} pertama merupakan nilai masukan soal mengikuti penjelasan di subbab \ref{sec:Parameter Masukan}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:generate_1} dan \ref{psdo:generate_2}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 GENERATE (N, L, Hm, limit)
@@ -293,8 +293,15 @@ while q < NLimit
 			continue
 		let g = 1
 		for k = 2 to q-1
-			find a value of g = k^(p/q) mod (p+1) that doesn’t result in 1 and g^q mod (p+1) results in 1
-			if such g found
+		find a value of g = k^(p/q) mod (p+1) that doesn’t result in 1 and g^q mod (p+1) results in 1
+\end{lstlisting}
+\caption{Desain Fungsi \textit{Generate (bg. 1)}}
+\label{psdo:generate_1}
+\end{figure}
+
+\begin{figure}[t!]
+\begin{lstlisting}[firstnumber=last]
+		if such g found
 			let x a random value between 1 and q-1 inclusive
 			let y = MODULAR-EXPONENTIATION (g, x, j + 1, j)
 			output (N, L, q, j + 1, g, y, Hm, x)
@@ -302,6 +309,6 @@ while q < NLimit
 			if limit == 0
 				quit function
 \end{lstlisting}
-\caption{Desain Fungsi \textit{Generate}}
-\label{psdo:generate}
+\caption{Desain Fungsi \textit{Generate (bg. 2)}}
+\label{psdo:generate_2}
 \end{figure}
