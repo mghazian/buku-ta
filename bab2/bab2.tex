@@ -227,8 +227,8 @@ Pencarian hasil persamaan \eqref{eq:pemangkatan_modular} dapat dicari secara ite
 NAIVE-MODULAR-EXPONENTIATION (g, k, p)
 let result = 1
 for i = 1 to k
-result = result * g
-result = result mod p
+	result = result * g
+	result = result mod p
 return h
 \end{lstlisting}
 \caption{Pseudocode Penyelesaian Pemangkatan Modular Secara Naif}
@@ -384,10 +384,10 @@ Pencarian invers modulus dapat dilakukan dengan \textit{brute force}. Semua nila
 \begin{lstlisting}[firstnumber=0]
 NAIVE-MODULAR-INVERSE (g, n)
 if gcd(g,n) != 1
-return “NOT INVERTIBLE”
+	return “NOT INVERTIBLE”
 for k = 1 to n-1
-if (g * k) mod n == 1
-return k
+	if (g * k) mod n == 1
+		return k
 \end{lstlisting}
 \caption{Pseudocode Pencarian Modular Invers Naif}
 \label{psdo:modinv_naive}
@@ -405,11 +405,11 @@ MODULAR-INVERSE-WITH-EXTENDED-EUCLIDEAN (a = qb + r)
 let EQUATION[] be a new array
 let i = 0
 while r != 0
-EQUATION[i] = (a = qb + r)
-find equation b = qr + m for some q and m
-i = i + 1
+	EQUATION[i] = (a = qb + r)
+	find equation b = qr + m for some q and m
+	i = i + 1
 for i = EQUATION.len – 1 downto 1
-substitute EQUATION[i].b with EQUATION[i+1].r
+	substitute EQUATION[i].b with EQUATION[i+1].r
 return (EQUATION[1].x, EQUATION[1].y)
 \end{lstlisting}
 \caption{Pseudocode \textit{Extended Euclidean}}
@@ -627,9 +627,9 @@ Pencarian nilai $ x $ pada persamaan \eqref{eq:persamaan_umum_log_diskret} bisa 
 NAIVE-DISCRETE-LOGARITHM (g, y, n)
 result = 1
 for i = 0 to n-1
-if result == y
-return i
-result = (result * g) mod n
+	if result == y
+		return i
+	result = (result * g) mod n
 return "NOT FOUND"
 \end{lstlisting}
 \caption{Pseudocode Pencarian Logaritma Diskret Secara Naif}
