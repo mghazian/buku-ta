@@ -33,7 +33,7 @@ Terdapat dua metode pencarian logaritma diskret yang akan diujikan pada penyeles
 
 \subsubsection {Desain Fungsi Baby-step Giant-step}
 
-Subbab ini akan menjabarkan desain fungsi \textit{Baby-step Giant-step} menurut penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Baby-step Giant-step} dalam bentuk \textit{pseudocode}. Fungsi ini menerima tiga \textit{integer}, yaitu $ g $, $ y $, $ n $. Keluaran fungsi ini adalah sebuah \textit{integer} $ x $. Masukan dan keluaran fungsi ini mengacu pada persamaan \eqref{eq:persamaan_umum_log_diskret}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:bsgs}.
+Subbab ini akan menjabarkan desain fungsi \textit{Baby-step Giant-step} menurut penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Baby-step Giant-step} dalam bentuk \textit{pseudocode}. Fungsi ini menerima tiga \textit{integer}, yaitu $ g $, $ y $, $ n $. Keluaran fungsi ini adalah sebuah \textit{integer} $ x $. Masukan dan keluaran fungsi ini mengacu pada persamaan \eqref{eq:persamaan_umum_log_diskret}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:bsgs}. Algoritma ini mengikuti penjelasan di \cite{hac_numtheory}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 BABY-STEP-GIANT-STEP (g, y, n)
@@ -41,7 +41,7 @@ let limit = sqrt (ord(g)) rounded upward
 let GIANTSTEPS[] be a new array
 let BABYSTEPS[] be a new array
 for i = 0 to limit-1
-	store pair <s = limit*i, t = g ^ (limit*i)> into GIANTSTEPS
+	store pair ~$ \langle s = limit*i, t = g ^ {limit*i} \rangle $~ into GIANTSTEPS
 for j = 0 to limit-1
 	store pair <s = j, t = y * g^j> into BABYSTEPS
 find a match between GIANTSTEPS and BABYSTEPS on the t.
@@ -55,7 +55,7 @@ return "NOT FOUND"
 
 \subsubsection {Desain Fungsi Pollard Rho dengan Brent Cycle Detection}
 
-Subbab ini akan menjabarkan desain fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection} menurut penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Pollard Rho} dan \ref{sec:Brent Cycle Detection}. Fungsi ini menerima tiga \textit{integer}, yaitu $ g $, $ y $, dan $ n $. Keluaran fungsi ini adalah \textit{integer} $ x $. Masukan dan keluaran fungsi ini mengacu pada persamaan \eqref{eq:persamaan_umum_log_diskret}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:brent_pollard_rho}.
+Subbab ini akan menjabarkan desain fungsi \textit{Pollard Rho} dengan \textit{Brent Cycle Detection} menurut penjelasan pada subbab \ref{sec:Strategi Penyelesaian Logaritma Diskret dengan Pollard Rho} dan \ref{sec:Brent Cycle Detection}. Fungsi ini menerima tiga \textit{integer}, yaitu $ g $, $ y $, dan $ n $. Keluaran fungsi ini adalah \textit{integer} $ x $. Masukan dan keluaran fungsi ini mengacu pada persamaan \eqref{eq:persamaan_umum_log_diskret}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:brent_pollard_rho}. Algoritma ini mengikuti penjelasan di \cite{hac_numtheory,brent_montecarlo}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 POLLARD-RHO-BRENT (g, y, n)
@@ -143,7 +143,7 @@ return result
 
 \subsection{Desain Fungsi Logarithmic Modular Multiplication}
 
-Subbab ini akan menjabarkan desain fungsi \textit{Logarithmic Modular Multiplication} mengikuti penjelasan pada subbab \ref{sec:Strategi Perkalian Modular dengan Logarithmic Modular Multiplication}. Fungsi ini menerima tiga masukan: sebuah nilai yang dikali $ a $, sebuah nilai pengali $ b $, dan sebuah modulus $ n $. Keluaran fungsi ini adalah sebuah \textit{integer} hasil perkalian. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modmul}.
+Subbab ini akan menjabarkan desain fungsi \textit{Logarithmic Modular Multiplication} mengikuti penjelasan pada subbab \ref{sec:Strategi Perkalian Modular dengan Logarithmic Modular Multiplication}. Fungsi ini menerima tiga masukan: sebuah nilai yang dikali $ a $, sebuah nilai pengali $ b $, dan sebuah modulus $ n $. Keluaran fungsi ini adalah sebuah \textit{integer} hasil perkalian. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modmul}. Algoritma ini mengikuti penjelasan di \cite{geeks_modular_multiplication}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 LOGARITHMIC-MODULAR-MULTIPLICATION (a, b, n)
@@ -161,7 +161,7 @@ return result
 
 \subsection{Desain Fungsi Invers Modulus}
 
-Fungsi ini digunakan pada banyak bagian penyelesaian permasalahan. Cara kerja fungsi ini mengacu pada penjelasan di subbab \ref{sec:Strategi Penyelesaian Invers Modulus dengan Extended Euclidean}. Fungsi menerima sebuah persamaan \ref{eq:persamaan_umum_pembagian}. Keluaran metode ini adalah koefisien sebuah nilai $ a $ dan sebuah modulus $ b $. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modinv}.
+Fungsi ini digunakan pada banyak bagian penyelesaian permasalahan. Cara kerja fungsi ini mengacu pada penjelasan di subbab \ref{sec:Strategi Penyelesaian Invers Modulus dengan Extended Euclidean}. Fungsi menerima sebuah persamaan \ref{eq:persamaan_umum_pembagian}. Keluaran metode ini adalah koefisien sebuah nilai $ a $ dan sebuah modulus $ b $. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:modinv}. Algoritma ini didapat dari \cite{hac_math}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 MODULAR-INVERSE (a = qb + r)
@@ -183,7 +183,7 @@ return (EQUATION[0].a.coefficient, EQUATION[0].b.coefficient)
 
 Fungsi uji kebenaran digunakan untuk melakukan uji coba kebenaran keseluruhan program pada tahapan komputasi utama. Fungsi ini akan digunakan sebagai \textit{catch-all error detection} untuk membantu proses \textit{debugging}. Fungsi ini bekerja mengikuti prosedur pada subbab \ref{sec:Lain-lain}.
 
-Fungsi ini menerima tujuh integer sebagai masukan dimana lima pertama merupakan masukan soal, dan dua selanjutnya merupakan \textit{signature} yang dibuat. Keluaran fungsi ini adalah enumerasi benar\textendash salah. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:verify}.
+Fungsi ini menerima tujuh \textit{integer} sebagai masukan dimana lima pertama merupakan masukan soal, dan dua selanjutnya merupakan \textit{signature} yang dibuat. Keluaran fungsi ini adalah enumerasi benar\textendash salah. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:verify}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 VERIFY (q, p, g, y, Hm, r, s)
@@ -273,7 +273,7 @@ return n*n + n + 41
 
 \subsection{Desain Fungsi Generate}
 
-Fungsi ini bertujuan untuk membuat data uji dengan karakteristik masukan yang diberikan. Dalam satu pemanggilan fungsi, akan dibuatkan paling banyak sebanyak \textit{limit} data uji yang memenuhi karakteristik masukan. Fungsi ini menerima empat \textit{integer} sebagai masukan, dan delapan \textit{integer} sebagai keluaran. Tujuh dari delapan \textit{integer} pertama merupakan nilai masukan soal mengikuti penjelasan di subbab \ref{sec:Parameter Masukan}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:generate_1} dan \ref{psdo:generate_2}.
+Fungsi ini bertujuan untuk membuat data uji dengan karakteristik masukan yang diberikan. Dalam satu pemanggilan fungsi, akan dibuatkan paling banyak sebanyak \textit{limit} data uji yang memenuhi karakteristik masukan. Fungsi ini menerima empat \textit{integer} sebagai masukan, dan delapan \textit{integer} sebagai keluaran. Tujuh dari delapan \textit{integer} pertama merupakan nilai masukan soal mengikuti penjelasan di subbab \ref{sec:Parameter Masukan}. Desain fungsi ini dapat dilihat pada gambar \ref{psdo:generate}.
 \begin{figure}[h!]
 \begin{lstlisting}[firstnumber=0]
 GENERATE (N, L, Hm, limit)
@@ -294,13 +294,6 @@ while q < NLimit
 		let g = 1
 		for k = 2 to q-1
 		find a value of g = k^(p/q) mod (p+1) that doesn’t result in 1 and g^q mod (p+1) results in 1
-\end{lstlisting}
-\caption{Desain Fungsi \textit{Generate (bg. 1)}}
-\label{psdo:generate_1}
-\end{figure}
-
-\begin{figure}[t!]
-\begin{lstlisting}[firstnumber=last]
 		if such g found
 			let x a random value between 1 and q-1 inclusive
 			let y = MODULAR-EXPONENTIATION (g, x, j + 1, j)
@@ -309,6 +302,6 @@ while q < NLimit
 			if limit == 0
 				quit function
 \end{lstlisting}
-\caption{Desain Fungsi \textit{Generate (bg. 2)}}
-\label{psdo:generate_2}
+\caption{Desain Fungsi \textit{Generate}}
+\label{psdo:generate}
 \end{figure}

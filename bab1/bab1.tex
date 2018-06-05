@@ -5,19 +5,35 @@ Pada bab ini, akan dijelaskan mengenai latar belakang, rumusan masalah, Batasan 
 
 \section{Latar Belakang}
 
-\par Permasalahan yang akan dijelaskan merupakan permasalahan pada situs Timus Online Judge pada soal 1598 DSA Attack. Pada permasalahan ini diberikan sekelompok parameter public key (N, L, q, p, g, y, Hm). Dengan parameter ini, soal meminta untuk dibuatkan sepasang nilai (\textit{r, s}). Pasangan nilai (\textit{r, s}) merupakan hasil proses signing pada metode digital signature.
+\par Pengiriman pesan oleh dua pihak (sebut saja, Alice sebagai pengirim dan Bob sebagai penerima) yang berada di mesin (komputer) yang berbeda memiliki beberapa masalah pada aspek keamanan. Salah satunya adalah mengenai integritas pesan. Tidak ada jaminan bahwa pesan yang diterima Bob merupakan pesan yang sama yang dikirimkan oleh Alice. Selain itu, tidak ada jaminan juga bahwa pesan yang diterima Bob memang benar berasal dari Alice. Kedua masalah ini membuka celah terjadinya tindak kriminal atau tersiarnya informasi yang bersifat rahasia. Kedua masalah ini dapat ditangani dengan menggunakan skema Digital Signature dalam mengirimkan pesan. \cite{stallings_cryptography}
 
-Soal telah menjelaskan langkah-langkah untuk membuat parameter, melakukan \textit{signing}, hingga melakukan verifikasi. Pada salah satu tahapan \textit{signing}, nilai \textit{private key x} dibutuhkan, sedangkan \textit{private key} tersebut tidak diberikan sebagai input. Pada soal, nilai \textit{private key x} disebutkan di bagian prosedur pembuatan parameter. Mengutip laman problem DSA Attack, prosedur pembuatan parameter dijelaskan sebagai berikut:
+Digital Signature merupakan skema untuk memastikan keotentikan sebuah dokumen dan keotentikan sumber pengiriman \cite{stallings_cryptography}. \textit{Signing} akan dilakukan pada pesan yang akan dikirimkan. Hasil \textit{signing} tersebut akan dikirimkan bersama pesan. Penerima pesan dapat dengan mudah memvalidasi apakah \textit{signature} pesan yang diterima sesuai dengan \textit{signature} yang datang bersama pesan tersebut. Namun bahkan dengan skema Digital Signature, keotentikan pesan yang diterima tidak sepenuhnya terjamin. Ada kemungkinan bahwa pihak ketiga membuat sebuah \textit{signature} berdasarkan pesan palsu, sehingga Bob sebagai penerima pesan melihat bahwa pesan yang diterima seolah-olah datang dari Alice. Sebuah \textit{signature} dikatakan dipalsukan apabila untuk sembarang pesan, sebuah \textit{signature} \textbf{baru} untuk pesan tersebut berhasil dibuat \cite{goldwasser_adaptive_chosen_message}.
+
+Terdapat beberapa jenis skema Digital Signature, seperti ElGamal, Schnorr, dan DSA (Digital Signature Algorithm). Tugas akhir ini berfokus pada skema yang ditetapkan sebagai standar Digital Signature: Digital Signature Algorithm \cite{stallings_cryptography}.
+
+Digital Signature Algorithm menggunakan \textit{public-key cryptosystem}, yaitu penggunaan pasangan kunci publik dan kunci privat. \textit{Public-key cryptosystem} yang digunakan Digital Signature Algorithm menggunakan penjelasan berikut.
+
+Diberikan tiga buah nilai, $ g $, $ x $, dan $ p $ dimana terdapat sebuah nilai $ q $ yang memenuhi persamaan $ g^q \equiv 1\ (mod\ p) $. Hitung nilai $ y $ menggunakan persamaan
+\[
+	y = g^x\ (mod\ p) \text{ untuk $ g $, $ x $, dan $ p $ tertentu}
+\]
+Maka \textit{public key} yang terbentuk adalah $\langle p, q, g, y \rangle$ dan private key yang terbentuk adalah $ x $.
+
+Salah satu hal penting untuk menjamin efektifitas skema DSA adalah kunci privat tidak boleh diketahui oleh pihak luar. \textit{Total Break} adalah kejadian saat kunci privat milik seorang pengguna berhasil dicari oleh pihak ketiga \cite{goldwasser_adaptive_chosen_message}. Dengan didapatnya kunci privat ini, pihak ketiga dengan bebas bisa membuat \textit{signature} untuk seluruh pesan yang diinginkan.
+
+Pencarian kunci privat pada skema Digital Signature Algorithm adalah pencarian nilai $ x $ pada persamaan $ y = g^x\ (mod\ p) $. Permasalahan ini umum disebut dengan permasalahan logaritma diskret. Permasalahan ini merupakan permasalahan yang sulit untuk diselesaikan \cite{stallings_cryptography}. Meskipun begitu, Pollard dan Shank masing-masing mengajukan satu metode yang dapat digunakan untuk menyelesaikan permasalahan logaritma diskret dengan kompleksitas yang sama, yaitu $ O(n) $ \cite{hac_numtheory}. Brent kemudian meningkatkan metode yang diajukan Pollard sebesar 24\% \cite{brent_montecarlo}. 
+
+Tugas akhir ini akan membangun dan membandingkan dua metode penyelesaian permasalahan logaritma diskret sebagai upaya melakukan pemalsuan \textit{signature}: Shank's Baby-step Giant-step dan Pollard Rho dengan deteksi siklus Brent. Tugas akhir ini akan menggunakan studi kasus \textit{problem} DSA Attack pada situs Timus Online Judge, dimana parameter skema Digital Signature Algorithm yang digunakan lebih sederhana:
 
 \begin{enumerate}
-\item Tentukan sebuah nilai \textit{x} secara acak dimana $0 < x < q$.
-\item Hitung nilai $y = g^x\ mod\ p$.
-\item Keluarkan nilai public key (\textit{p, q, g, y}) dengan \textit{private key x}.
+	\item $ N $, bilangan bulat yang menentukan panjang bit parameter $ q $.
+	\item $ L $, bilangan bulat yang menentukan panjang bit parameter $ p $.
+	\item $ q $, sebuah komponen \textit{public key} berupa bilangan prima.
+	\item $ p $, sebuah komponen \textit{public key} berupa bilangan prima dimana $ p-1 $ habis dibagi $ q $.
+	\item $ g $, sebuah komponen \textit{public key} berupa bilangan dengan \textit{multiplicative order modulo} $ p $ sebesar $ q $.
+	\item $ y $, sebuah komponen \textit{public key} bilangan yang terbentuk dari $ y = g^x\ (mod\ p) $ untuk $ x $ tertentu.
+	\item $ H(m) $, sebuah pesan yang telah di-\textit{hash}.
 \end{enumerate}
-
-Berdasarkan prosedur pembuatan parameter, nilai \textit{x} digunakan bersama dengan \textit{y}, \textit{g}, dan \textit{p}. Tepatnya, nilai \textit{x} digunakan pada persamaan $y = g^x\ mod\ p$. Karena nilai \textit{y}, \textit{g}, dan \textit{p} telah diberikan sebagai input, nilai \textit{x} secara teori bisa dicari. Model permasalahan ini disebut dengan \textit{Discrete Logarithm Problem}.
-
-Secara garis besar, \textit{Discrete Logarithm Problem} sekaligus permasalahan DSA Attack dapat diselesaikan menggunakan salah satu dari dua metode: \textit{Baby-step Giant-step} dan \textit{Pollard Rho}. Kedua metode ini memiliki order fungsi pertumbuhan yang sama. Kendati begitu, didapati bahwa hanya satu metode yang dapat digunakan sebagai solusi permasalahan DSA Attack, yaitu \textit{Baby-step Giant-step}. Tugas akhir ini ditujukan untuk menggali lebih dalam terkait penyebab fenomena tersebut.
 
 \section {Rumusan Masalah}
 
@@ -26,7 +42,6 @@ Permasalahan yang akan diselesaikan pada tugas akhir ini adalah sebagai berikut:
 \begin {enumerate}
 \item Bagaimana performa metode \textit{Baby-step Giant-step} yang diimplementasikan pada saat menyelesaikan permasalahan DSA Attack?
 \item Bagaimana performa metode \textit{Pollard Rho} yang diimplementasikan pada saat menyelesaikan permasalahan DSA Attack?
-\item Perbedaan apa, jika ada, yang menyebabkan metode Baby-step Giant-step dapat digunakan sebagai metode penyelesaian DSA Attack namun metode Pollard Rho tidak?
 \end {enumerate}
 
 \section {Batasan Masalah}
@@ -35,7 +50,7 @@ Masalah yang akan diselesaikan memiliki batasan-batasan berikut:
 
 \begin {enumerate}
 \item Implementasi dilakukan menggunakan bahasa pemrograman C++.
-\item Nilai hash pesan memiliki panjang paling sedikit 3 bit, dan paling banyak 36 bit. 
+\item Nilai \textit{hash} pesan memiliki panjang paling sedikit 3 bit, dan paling banyak 36 bit. 
 \item Parameter \textit{public key q} memiliki panjang paling sedikit 3 bit, dan paling banyak 36 bit. Panjang parameter \textit{q} sama dengan panjang nilai \textit{hash} pesan.
 \item Parameter \textit{public key p} memiliki panjang paling sedikit 6 bit, dan paling banyak 60 bit. Panjang \textit{p} harus setidaknya 3 bit lebih panjang daripada \textit{q}.
 \item Parameter \textit{public key g} memiliki rentang nilai $1 < g < p$.
@@ -49,7 +64,6 @@ Tujuan tugas akhir ini adalah sebagai berikut:
 \begin{enumerate}
 \item Mengevaluasi performa metode \textit{Baby-step Giant-step} yang diimplementasikan untuk menyelesaikan permasalahan DSA Attack.
 \item Mengevaluasi performa metode \textit{Pollard Rho} yang diimplementasikan untuk menyelesaikan permasalahan DSA Attack.
-\item Membandingkan performa metode \textit{Baby-step Giant-step} dengan \textit{Pollard Rho} yang diimplementasikan untuk menyelesaikan permasalahan DSA Attack.
 \end{enumerate}
 
 \section {Metodologi}
@@ -74,7 +88,10 @@ Pada tahapan ini penulis menyusun hasil pengerjaan tugas akhir mengikuti format 
 Sistematika laporan tugas akhir yang akan digunakan adalah sebagai berikut:
 
 \begin{enumerate}
-\item Bagian awal, meliputi halaman depan, halaman pengesahan, abstrak, kata pengantar, daftar isi, daftar gambar, dan daftar tabel.
-\item Bagian inti, meliputi pendahuluan, tinjauan pustaka, metodologi, hasil dan pembahasan, dan kesimpulan dan saran.
-\item Bagian akhir, meliputi daftar pustaka, lampiran-lampiran, dan biodata penulis.
+\item Bab 1. Bagian ini akan menjelaskan mengenai konteks tugas akhir yang akan dikerjakan, termasuk latar belakang, tujuan, rumusan masalah, dan metodologi.
+\item Bab 2. Bagian ini akan menjelaskan mengenai dasar teori yang akan digunakan dalam pengerjaan tugas akhir.
+\item Bab 3. Bagian ini akan menjelaskan mengenai desain program yang akan dibangun berdasarkan dasar teori pada bab 2.
+\item Bab 4. Bagian ini akan menjelaskan implementasi desain program yang dijelaskan pada bab 3.
+\item Bab 5. Bagian ini akan menjelaskan mengenai hasil pengujian program yang telah diimplementasikan pada bab 4.
+\item Bab 6. Bagian ini berisi kesimpulan yang akan menjawab rumusan masalah.
 \end{enumerate}
