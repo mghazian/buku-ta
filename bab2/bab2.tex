@@ -743,7 +743,7 @@ Kemudian jabarkan persamaan $ f_n (x_s)=f_n (x_t) $, $ s>t $ dalam bentuk persam
 f_n (x_s) &\equiv f_n (x_t)\ (mod\ n) \\
 \alpha^{a_s} * \beta^{b_s} &\equiv \alpha^{a_t} * \beta^{b_t}\ (mod\ n) \\
 \alpha^{a_s-a_t} &\equiv \beta^{b_t-b_s}\ (mod\ n) \\
-a_s - a_t &\equiv log_{\alpha} \beta * (b_t - b_s)\ (mod\ \phi(n))
+a_s - a_t &\equiv log_{\alpha} \beta * (b_t - b_s)\ (mod\ ord(\alpha))
 \label{eq:persamaan_umum_step_logaritmik}
 \end{align}
 Dengan memasukkan nilai $ \alpha=g $ dan $ \beta=y $, persamaan \eqref{eq:persamaan_umum_step_logaritmik} memberikan nilai logaritma diskret $ y $.
